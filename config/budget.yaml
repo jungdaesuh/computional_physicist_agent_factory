@@ -1,0 +1,26 @@
+# config/budget.yaml
+# Budget caps and limits configuration for the factory.
+
+program:
+  aggregate_dollar_cap: 500.00
+  aggregate_kill_switch_enabled: true
+
+day:
+  dollars: 100.00
+  tokens: 10000000
+  wall_clock_seconds: 86400
+
+default_hypothesis:
+  dollars: 100.00         # Phase B per-hypothesis dollar cap
+  tokens: 2000000
+  wall_clock_seconds: 7200
+  iterations: 10
+
+flush:
+  state_debounce_seconds: 5
+
+ledger:
+  fsync_every_n_entries: 1
+
+reservation:
+  ttl_seconds: 300

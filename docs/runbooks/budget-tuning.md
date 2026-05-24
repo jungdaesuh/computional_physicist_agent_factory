@@ -27,7 +27,7 @@ Default text format prints (per spec 013 §3 surface):
 
 ```
 PROGRAM
-  aggregate_dollar_cap           : $1000.00     halt_active=false
+  aggregate_dollar_cap           : $500.00      halt_active=false
   aggregate_kill_switch_enabled  : true
 
 DAY (window 2026-05-23T00:00:00Z → 2026-05-24T00:00:00Z)

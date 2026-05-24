@@ -1,0 +1,18 @@
+# config/selector/weights.yaml — Weights and parameters for the Simulator Selector
+#
+# These weights govern how simulators are ranked based on their capabilities,
+# licensing, estimated cost, cross-validation availability, and maintenance signal.
+#
+# The five primary weights (capability_match, license_compliance, cost,
+# cross_simulator_availability, maintenance_freshness) MUST sum to exactly 1.0.
+
+capability_match: 0.40
+license_compliance: 0.10
+cost: 0.20
+cross_simulator_availability: 0.20
+maintenance_freshness: 0.10
+
+# Tunable scoring parameters
+ambiguity_epsilon: 0.03
+cost_estimate_missing_penalty: 0.15
+over_budget_penalty: 0.30

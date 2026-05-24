@@ -1,6 +1,8 @@
 # AI Co-Computational Physicist Factory — Documentation Index
 
-The navigation hub for the project's documentation. The top-level `SPEC.md` is the canonical architectural specification; `ARCHITECTURE.md` defines the modularity and onboarding invariants the codebase must satisfy; this index maps both into detailed component specs and milestone PRDs, with implementation checkboxes per spec.
+The navigation hub for the project's documentation. The top-level `SPEC.md` is the canonical, reference-free architectural specification; `ARCHITECTURE.md` defines the modularity and onboarding invariants the codebase must satisfy; this index maps both into detailed component specs and milestone PRDs, with implementation checkboxes per spec.
+
+A local root `../computational_physicist_factory.md`, if present, is reference/provenance only. It is not an implementation spec. If it conflicts with `SPEC.md` or `specs/*.md`, the docs specification wins.
 
 > **Status legend:** ☐ not started · ◐ in progress · ☑ complete · ⊘ deferred to later phase
 
@@ -69,7 +71,7 @@ Each spec is implementation-grade — interfaces, schemas, algorithms, failure m
 | 004 | Simulator Catalog | ☐ | Full | 002 |
 | 005 | Simulator Selector | ☐ | Full | 002, 004 |
 | 006 | Domain Adapter | ☐ | Skeleton | 002, 004, 008 |
-| 007 | Literature Discovery (OpenAlex + Gap Miner) | ☐ | Skeleton | 002 |
+| 007 | Literature Discovery (OpenAlex + Gap Miner) | ◐ | Skeleton | 002 |
 | 008 | Generator-Verifier Loop | ☐ | Full | 001, 002, 006, 013 |
 | 009 | Validation Portfolio (G4) | ☐ | Full | 002, 004, 012 |
 | 010 | Surrogate Models | ☐ | Skeleton | 002, 012 |
@@ -80,6 +82,7 @@ Each spec is implementation-grade — interfaces, schemas, algorithms, failure m
 | 015 | Operator Interface (CLI + HTTP API) | ☐ | Skeleton | 001, 002, 012, 013 |
 | 016 | Strategy Archive (BFTS + Bayesian surprise + UCT + MAP-Elites) | ☐ | Full | 002, 012 |
 | 017 | Fidelity Ladder Scheduler | ☐ | Full | 002, 010, 006 |
+| 018 | OpenRouter Client (shared LLM substrate) | ☐ | Full | `openai` SDK, `config/pricing/openrouter.yaml` — consumed by 001, 007, 008, 010, 011, 016 |
 
 ---
 
@@ -145,6 +148,19 @@ Each spec is implementation-grade — interfaces, schemas, algorithms, failure m
        │                        │Scheduler │                          │
        │                        └──────────┘                          │
        └──────────────────────────────────────────────────────────────┘
+
+       LLM substrate (FIX_PLAN §27 — Week 0 prerequisite)
+       ┌──────────────────────────────────────────────────────────────┐
+       │                                                              │
+       │                 ┌──────────┐                                 │
+       │                 │   018    │ ──► 001 (Council)               │
+       │                 │OpenRouter│ ──► 007 (Literature / Gap Miner)│
+       │                 │  Client  │ ──► 008 (Generator-Verifier)    │
+       │                 │ (shared  │ ──► 010 (Surrogate OOD audit)   │
+       │                 │   LLM    │ ──► 011 (RAG Writer)            │
+       │                 │substrate)│ ──► 016 (GuideLLM in Strategy)  │
+       │                 └──────────┘                                 │
+       └──────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -152,6 +168,17 @@ Each spec is implementation-grade — interfaces, schemas, algorithms, failure m
 ## 4. Top-Level TODO — Phase A Critical Path
 
 Ordered by dependency. Check off as deliverables land. Each line links to the spec where the implementation TODO lives.
+
+### LLM substrate (Week 0 — prerequisite)
+
+Every Phase A spec that touches an LLM imports `from factory.llm_client import OpenRouterClient` (live) or `FileClient` (fixture-replay tests). Land this before specs 001, 007, 008, 010, 011, 016.
+
+- [ ] Implement `OpenRouterClient` against the `openai` SDK with `base_url="https://openrouter.ai/api/v1"` and single env var `OPENROUTER_API_KEY` (`DecisionClient` Protocol contract) → `specs/018-openrouter-client.md`
+- [ ] `RateLimitedDecisionClient` wrapper with a process-wide token-bucket limiter (proxima reference pattern) → `specs/018-openrouter-client.md`
+- [ ] `FileClient` fixture-replay mock client + `MockOpenRouterClient` for unit tests → `specs/018-openrouter-client.md`
+- [ ] Pricing-table loader for `config/pricing/openrouter.yaml` (5 model rows: 4 council + 1 agentic default) → `specs/018-openrouter-client.md`, `FIX_PLAN.md §25.6`
+- [ ] Retry / backoff taxonomy (`TransientAPIError`, `OpenRouterAuthError`, `OpenRouterRateLimitError`, `OpenRouterConnectError`) with refuse-retry on auth errors → `specs/018-openrouter-client.md`, `FIX_PLAN.md §27.2`
+- [ ] Live smoke test against `OPENROUTER_API_KEY` covering one council model + `google/gemini-3.5-flash`; gated by `@pytest.mark.live` → `specs/018-openrouter-client.md`
 
 ### Foundation (Weeks 1–2)
 
@@ -184,8 +211,8 @@ Ordered by dependency. Check off as deliverables land. Each line links to the sp
 
 ### Literature & Writing (Weeks 9–10)
 
-- [ ] OpenAlex client + traversal + ranker → `specs/007-literature-discovery.md`
-- [ ] Gap Miner (4 gap-types) → `specs/007-literature-discovery.md`
+- [ ] OpenAlex client + traversal + production ranker → `specs/007-literature-discovery.md`
+- [x] Gap Miner (4 gap-types) → `specs/007-literature-discovery.md`
 - [ ] Paper Store schema + RAG writer skeleton → `specs/011-rag-writer.md`
 
 ### Strategy + Fidelity (Weeks 6–7)

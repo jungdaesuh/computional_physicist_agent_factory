@@ -105,6 +105,9 @@ Each deliverable links to the spec that defines it. Status tracked in `INDEX.md`
 | Budget tracker | `specs/013-budget-tracker.md` | Per-hypothesis + aggregate; kill switch. |
 | Telemetry & audit log | `specs/014-telemetry-and-audit.md` | Retention + export. |
 | Operator CLI + read-only HTTP API | `specs/015-operator-interface.md` | UI backend. |
+| Strategy Archive (BFTS + Bayesian surprise + UCT + MAP-Elites) | `specs/016-strategy-archive.md` | What-to-try-next substrate; wired into Generator-Verifier per `FIX_PLAN §26.2`. |
+| Fidelity Ladder Scheduler | `specs/017-fidelity-scheduler.md` | Runtime traversal of `ExperimentSpec.fidelity_ladder`; G3 / G4 transitions per `FIX_PLAN §26.3`. |
+| OpenRouter Client (shared LLM substrate) | `specs/018-openrouter-client.md` | Week 0 prerequisite — `DecisionClient` Protocol + `OpenRouterClient` + `FileClient`. Per `FIX_PLAN §27`. |
 | Mission Control + Hypothesis Detail + Council Deliberation UI screens | `UI_DESIGN.md` §1, §4, §3 | Minimum operator surface. |
 
 ## 7. Risks & Mitigations
@@ -125,7 +128,7 @@ Each deliverable links to the spec that defines it. Status tracked in `INDEX.md`
 
 PRD-001 closes when **all** of:
 
-- [ ] All Phase A specs (001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015) have status ☑ in `INDEX.md`.
+- [ ] All Phase A specs (001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018) have status ☑ in `INDEX.md` (17 specs total per FIX_PLAN §26 + §27).
 - [ ] One successful end-to-end autonomous cycle completes per the success-metrics table in §4.
 - [ ] OR one defensible-null cycle completes that emits an `inconclusive` Ledger entry with full provenance and a clear explanation of why Phase A tooling could not validate the hypothesis.
 - [ ] Cross-simulator validation has fired at least once during Phase A (proof that the orthogonal-check defense is live).
@@ -150,3 +153,6 @@ PRD-001 closes when **all** of:
 - `specs/013-budget-tracker.md` — Cost enforcement.
 - `specs/014-telemetry-and-audit.md` — Observability.
 - `specs/015-operator-interface.md` — CLI + API.
+- `specs/016-strategy-archive.md` — Strategy Archive + Bayesian surprise + UCT.
+- `specs/017-fidelity-scheduler.md` — Multi-fidelity ladder scheduler.
+- `specs/018-openrouter-client.md` — Shared LLM substrate (Week 0 prerequisite).

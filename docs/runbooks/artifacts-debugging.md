@@ -94,7 +94,7 @@ This is a *Shape B* failure. Possible causes, in order of likelihood:
 3. **Encoding drift.** Canonical JSON requires sorted keys, no whitespace, and UTF-8. Confirm by re-serializing:
    ```bash
    python -m factory.artifacts show --raw runs/<cycle-id>/artifacts/<hash>.json | \
-     jq -c -S '. | del(.provenance_hash)' | shasum -a 256
+     jq -c -S '. | del(.provenance_hash, .created_at)' | shasum -a 256
    ```
    The output should match `stored`. If not, the file's on-disk encoding diverged from canonical.
 

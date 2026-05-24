@@ -1,0 +1,41 @@
+{
+  "artifact_type": "EvidenceLedgerEntry",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "f6f4f6d110b46e2a525fa65e8c1034482f6a535258fa4fd0a15cfc45cc932b3e",
+  "parent_hashes": [
+    "ada26da85bd38c7fbdebfb8345437b86b463c9a4af9b2c8e6ae147fdb1b2d91a"
+  ],
+  "hypothesis_id": "HYP-001",
+  "result": "passed",
+  "terminal_state": "terminate_published_external",
+  "provenance": {
+    "code_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "env_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "input_hash": "ada26da85bd38c7fbdebfb8345437b86b463c9a4af9b2c8e6ae147fdb1b2d91a",
+    "seed": 42,
+    "simulator_id": "desc",
+    "simulator_version": "v0.11",
+    "container_sha": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "uncertainty": {
+    "metric_name": "force_balance_residual",
+    "point_estimate": 1.2e-06,
+    "ci_lower": 1e-06,
+    "ci_upper": 1.4e-06,
+    "ci_method": "bootstrap",
+    "n_seeds": 3
+  },
+  "relitigate_if": [
+    {
+      "condition": "simulator_version > v0.11",
+      "check_fn": "check_version",
+      "last_evaluated_at": null,
+      "currently_satisfied": false
+    }
+  ],
+  "council_verdict_hashes": [
+    "5d9cbafea527018460ff193dbe5d6e6d02d3a6b962a474a78b070eed1d361536"
+  ],
+  "run_report_hash": null,
+  "surprise_bits": 5.4
+}

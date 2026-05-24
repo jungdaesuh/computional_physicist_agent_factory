@@ -1,0 +1,157 @@
+{
+  "$defs": {
+    "CouncilId": {
+      "description": "The five decision gates driven by councils.",
+      "enum": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5"
+      ],
+      "title": "CouncilId",
+      "type": "string"
+    },
+    "DissentEntry": {
+      "additionalProperties": false,
+      "description": "Represents a minority objection preserved from deliberation.",
+      "properties": {
+        "model_id": {
+          "title": "Model Id",
+          "type": "string"
+        },
+        "persona": {
+          "$ref": "#/$defs/PersonaName"
+        },
+        "view": {
+          "title": "View",
+          "type": "string"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "model_id",
+        "persona",
+        "view",
+        "rationale"
+      ],
+      "title": "DissentEntry",
+      "type": "object"
+    },
+    "PersonaName": {
+      "description": "Adversarial personas that council models run under to provide diversity.",
+      "enum": [
+        "visionary",
+        "pessimist",
+        "pragmatist"
+      ],
+      "title": "PersonaName",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Deliberation outcome of a decision council.",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    },
+    "council_id": {
+      "$ref": "#/$defs/CouncilId"
+    },
+    "question": {
+      "title": "Question",
+      "type": "string"
+    },
+    "model_lineup": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Model Lineup",
+      "type": "array"
+    },
+    "persona_assignment": {
+      "additionalProperties": {
+        "$ref": "#/$defs/PersonaName"
+      },
+      "title": "Persona Assignment",
+      "type": "object"
+    },
+    "chairman_model": {
+      "title": "Chairman Model",
+      "type": "string"
+    },
+    "majority_view": {
+      "title": "Majority View",
+      "type": "string"
+    },
+    "preserved_dissents": {
+      "items": {
+        "$ref": "#/$defs/DissentEntry"
+      },
+      "title": "Preserved Dissents",
+      "type": "array"
+    },
+    "chairman_decision": {
+      "enum": [
+        "approve",
+        "reject",
+        "qualified",
+        "no_consensus"
+      ],
+      "title": "Chairman Decision",
+      "type": "string"
+    },
+    "total_cost_usd": {
+      "title": "Total Cost Usd",
+      "type": "number"
+    },
+    "wall_clock_seconds": {
+      "title": "Wall Clock Seconds",
+      "type": "number"
+    },
+    "session_id": {
+      "title": "Session Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash",
+    "council_id",
+    "question",
+    "model_lineup",
+    "persona_assignment",
+    "chairman_model",
+    "majority_view",
+    "preserved_dissents",
+    "chairman_decision",
+    "total_cost_usd",
+    "wall_clock_seconds",
+    "session_id"
+  ],
+  "title": "CouncilVerdict",
+  "type": "object"
+}

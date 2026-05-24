@@ -28,9 +28,8 @@ Per FIX_PLAN §25.6, all LLM access (council + agentic) flows through OpenRouter
 
 | Variable | Purpose | Required for live mode? |
 | :--- | :--- | :--- |
-| `OPENROUTER_API_KEY` | Single API key for all LLM access via OpenRouter — council (4 vendors via `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1`, `x-ai/grok-4.3`) and agentic default (`google/gemini-3.5-flash`). Used by the shared `openai` SDK client (FIX_PLAN §25.2). | yes |
-| `OPENALEX_MAILTO` | OpenAlex polite-pool email | recommended |
-| `OPENALEX_API_KEY` | Higher OpenAlex rate limit | optional |
+| `OPENROUTER_API_KEY` | Single API key for all LLM access via OpenRouter — council (4 vendors via `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1-pro-preview`, `x-ai/grok-4.3`) and agentic default (`google/gemini-3.5-flash`). Used by the shared `openai` SDK client (FIX_PLAN §25.2). | yes |
+| `OPENALEX_API_KEY` | OpenAlex live literature-discovery API key | yes for live literature discovery |
 | `FACTORY_MOCK` | Force mock mode | no |
 | `FACTORY_CONFIG_DIR` | Override config dir | no |
 
@@ -233,7 +232,7 @@ The HTTP surface returns Pydantic response models that are *projections* of type
 - `factory budget set` accepts any combination of `--aggregate-usd`, `--per-hypothesis-usd`, `--daily-usd`. The handler resolves the `BudgetTracker` from spec 013 and invokes `tracker.set_cap(tier=..., dollars=...)` once per provided flag, then appends a single `FactoryControlEvent` enumerating the applied caps. There is intentionally no `--per-cycle-usd` flag (FIX_PLAN §6.2).
 
 ### 5.7 Council calibration (`factory council calibrate`)
-- Runs the calibration probe set against the **4-vendor OpenRouter lineup** defined in `config/council/lineup.yaml` (FIX_PLAN §25.3 / §25.4) — one call per vendor: `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1`, `x-ai/grok-4.3`. Each call carries a persona assignment (Visionary / Pessimist / Pragmatist) per the lineup config.
+- Runs the calibration probe set against the **4-vendor OpenRouter lineup** defined in `config/council/lineup.yaml` (FIX_PLAN §25.3 / §25.4) — one call per vendor: `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1-pro-preview`, `x-ai/grok-4.3`. Each call carries a persona assignment (Visionary / Pessimist / Pragmatist) per the lineup config.
 - The acceptance threshold is the restored target: overall disagreement-rate ≥ **0.40** (FIX_PLAN §25.4 — restored from §24's lowered 0.25). The empirical floor for the redesign-trigger is the pre-§24 value as documented in PRD-002.
 - The handler reads `OPENROUTER_API_KEY` from the environment (unless `--mock-mode` is active) and writes a `FactoryControlEvent` plus a calibration report to `runs/_calibration/<ts>/report.json` (FIX_PLAN §10). A report below the empirical floor exits non-zero and prints the redesign-trigger banner. A single-vendor failure inside the lineup (any of the 4 OpenRouter vendors unreachable) is a fail — vendor heterogeneity IS the sycophancy defense (§25.3 invariant).
 

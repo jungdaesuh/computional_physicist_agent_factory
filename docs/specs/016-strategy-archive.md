@@ -412,16 +412,18 @@ class StrategyArchive:
 # --------------------------------------------------------------------------
 
 class GeminiFlashGuideLLM:
-    """Concrete `GuideLLM` implementation using the shared OpenRouter client.
+    """Concrete `GuideLLM` implementation backed by the shared LLM substrate.
 
-    Reuses the same `_CLIENT = OpenAI(base_url="https://openrouter.ai/api/v1",
-    api_key=os.environ["OPENROUTER_API_KEY"])` instance the council library
-    uses (FIX_PLAN §25.1). The only difference is the request shape:
+    Imports `from factory.llm_client import OpenRouterClient` (spec 018) — the
+    same `DecisionClient` Protocol the council library uses (FIX_PLAN §27.2).
+    The only differences are the request shape:
       - model = "google/gemini-3.5-flash"
       - response_format = {"type": "json_object"} so the bool/bucket answer
         parses unambiguously.
 
-    No `temperature` / `top_p` / `top_k` override (FIX_PLAN §25.7).
+    No `openai`-SDK / `base_url` / `OPENROUTER_API_KEY` surface in this module —
+    the shared client owns all of that. No `temperature` / `top_p` / `top_k`
+    override (FIX_PLAN §25.7).
     """
 
     async def boolean(self, prompt: str) -> bool: ...
@@ -967,7 +969,7 @@ All errors inherit `FactoryError` per FIX_PLAN §6.3 + spec 002 §3 (so the stat
 - [ ] Implement `factory/strategy/archive.py` — `StrategyArchive` class with `attribute_surprise`, `attribute_reward`, `select_lineages`, `top_k`, `add_strategy`, `transfer_priors_from` methods. The archive does NOT open or close the SQLite connection; it receives one from the Ledger (spec 012).
 - [ ] Implement `factory/strategy/selection.py` — `select_lineages_for_parallel` algorithm (§5.4) plus `_load_candidates`, `_normalize`, `_descriptor_vector`, `_descriptor_cell`, `_cosine_distance`, `_novelty`, `_cell_elites`, `_elite_key` helpers.
 - [ ] Implement `factory/strategy/evidence.py` — `collect_cycle_strategy_evidence` (aggregates candidate metrics per strategy across one cycle, returns `tuple[StrategyCycleEvidence, ...]`); `positive_constraint_overshoots`; `merge_constraint_overshoot_json`.
-- [ ] Define `GuideLLM` Protocol in `factory/strategy/api.py` and the concrete `GeminiFlashGuideLLM` implementation sharing the OpenRouter client from spec 001 (the council library exposes the `_CLIENT` instance through `factory.council.openrouter_client`).
+- [ ] Define `GuideLLM` Protocol in `factory/strategy/api.py` and the concrete `GeminiFlashGuideLLM` implementation backed by `from factory.llm_client import OpenRouterClient` (spec 018) — the shared LLM substrate; FIX_PLAN §27.2.
 - [ ] Add typed artifacts `Strategy`, `StrategyCycleEvidence`, `BehaviorDescriptor`, `ConstraintOvershootStats` to spec 002 (per FIX_PLAN §26.4). The archive imports them; it does NOT define them.
 - [ ] Add `surprise_bits: float | None` column to `EvidenceLedgerEntry` (spec 002 + spec 012 schema migration).
 - [ ] Implement `factory/strategy/cli.py` with `add`, `select`, `attribute-surprise`, `attribute-reward`, `top-k`, `transfer-priors` subcommands reachable as `python -m factory.strategy <subcommand>`. The `--mock-mode` flag wires `MockGuideLLM` so CI can run all subcommands offline.

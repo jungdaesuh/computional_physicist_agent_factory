@@ -296,11 +296,17 @@ Phase A: human-curated, 5–10 entries. Phase B: human-approved onboarding workf
 ### Chairman Synthesis
 Stage 3 of council deliberation. Chairman model produces a `CouncilVerdict` with majority view + every dissent + chairman_decision. Scalar Go/No-Go output is forbidden. Selection policy ∈ {random, round_robin, weighted_by_cost}. → `SPEC.md §3.2`, `specs/001-council.md §5.3`
 
+### Compaction
+LLM-driven summarization triggered when message-history tokens exceed `AUTO_COMPACT_TOKEN_LIMIT = 200_000`. Replaces the prior history with a summary, keeping the multi-turn loop running across long cycles. Uses the same shared OpenRouter client (spec 018) and the agentic default model `google/gemini-3.5-flash`. → `specs/008-generator-verifier.md §5`, `FIX_PLAN.md §27.1`
+
 ### Content-Addressed Artifact
-Every artifact carries a SHA-256 `provenance_hash` computed over canonical JSON (sorted keys, no whitespace, `provenance_hash` field excluded). Filename in artifact store IS the hash. References between artifacts use hashes, not paths. → `ARCHITECTURE.md §1.8`, `specs/002-artifacts.md §5.1`
+Every artifact carries a SHA-256 `provenance_hash` computed over canonical JSON (sorted keys, no whitespace, `provenance_hash` and `created_at` fields excluded). Filename in artifact store IS the hash. References between artifacts use hashes, not paths. → `ARCHITECTURE.md §1.8`, `specs/002-artifacts.md §5.1`
 
 ### Cross-Simulator Validation
 G4 portfolio check that re-runs the candidate's observable on a second OSI-licensed Catalog simulator and compares results against the `cross_simulator_equivalence_map` tolerance. Disagreement → cycle is `inconclusive`. Unavailable when Catalog supports only one simulator for the observable; portfolio reweights toward refinement + symmetry. → `SPEC.md §4 G4`, `SPEC.md §8 final paragraph`
+
+### DecisionClient Protocol
+`def invoke(messages, *, model, max_tokens, response_format) -> OpenRouterResponse`. The synchronous one-round-trip contract every LLM consumer imports against. Allows drop-in swap between the live `OpenRouterClient` and the fixture-replay `FileClient` without changing call sites. → `specs/018-openrouter-client.md §3`
 
 ### Diff-Based Iteration Tracking
 Each Generator-Verifier iteration writes `diff.patch` against the previous iteration's blueprint via `difflib.unified_diff` (stdlib) or `git diff --no-index`. Used postmortem (`factory.genver diff-iterations`); not fed back into the prompt directly. → `specs/008-generator-verifier.md §5.7`
@@ -327,10 +333,10 @@ The **agentic default model** (not the council model). Accessed via OpenRouter a
 G4 symmetry fixtures kept under `factory/validation/fixtures/symmetry/<domain>/` *outside* any code-gen read-allowlist. Defense against invariant hacking. `verify-holdout-isolation` CLI asserts non-leakage; leak triggers `HeldoutLeakDetected` hard halt. → `specs/009-validation-portfolio.md §2`, `specs/009-validation-portfolio.md §LOCAL DEBUG`
 
 ### Council Composition (vendor + persona heterogeneity)
-Exactly 4 independent calls per council session, one per vendor via OpenRouter (`openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1`, `x-ai/grok-4.3`), each carrying a Visionary / Pessimist / Pragmatist persona system instruction. Two orthogonal axes of diversity — **vendor** (primary defense) + **persona** (orthogonal reinforcement). Persona-to-vendor assignment rotates per cycle; the 4 vendors are fixed. Random chairmanship per session, drawn from the persona set. Single-vendor failure raises `CouncilError` (no silent substitution — vendor heterogeneity IS the defense). → `SPEC.md §3.1`, `specs/001-council.md §3`, `FIX_PLAN.md §25.3` (§25 SUPERSEDES §24)
+Exactly 4 independent calls per council session, one per vendor via OpenRouter (`openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1-pro-preview`, `x-ai/grok-4.3`), each carrying a Visionary / Pessimist / Pragmatist persona system instruction. Two orthogonal axes of diversity — **vendor** (primary defense) + **persona** (orthogonal reinforcement). Persona-to-vendor assignment rotates per cycle; the 4 vendors are fixed. Random chairmanship per session, drawn from the persona set. Single-vendor failure raises `CouncilError` (no silent substitution — vendor heterogeneity IS the defense). → `SPEC.md §3.1`, `specs/001-council.md §3`, `FIX_PLAN.md §25.3` (§25 SUPERSEDES §24)
 
 ### Council models
-The 4 OpenRouter model IDs that constitute the per-cycle council lineup, one per vendor: `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1`, `x-ai/grok-4.3`. Exact ID strings verified at setup time against `curl https://openrouter.ai/api/v1/models -H "Authorization: Bearer $OPENROUTER_API_KEY"`; ID drift updates config only, never code. Distinct from the **agentic default model** (`google/gemini-3.5-flash`) used for non-council LLM calls. → `FIX_PLAN.md §25.3`
+The 4 OpenRouter model IDs that constitute the per-cycle council lineup, one per vendor: `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1-pro-preview`, `x-ai/grok-4.3`. Exact ID strings verified at setup time against `curl https://openrouter.ai/api/v1/models -H "Authorization: Bearer $OPENROUTER_API_KEY"`; ID drift updates config only, never code. Distinct from the **agentic default model** (`google/gemini-3.5-flash`) used for non-council LLM calls. → `FIX_PLAN.md §25.3`
 
 ### Immutability
 Artifacts use Pydantic `ConfigDict(frozen=True)`. Update pattern: `new = old.model_copy(update={...})` — produces a new artifact with a different hash; old is unchanged. → `ARCHITECTURE.md §1.8`, `specs/002-artifacts.md §5.2`
@@ -359,11 +365,17 @@ Diversity-preserving archive that maintains the best candidate per behavior-desc
 ### Mock Mode
 First-class operating mode where external dependencies (LLMs, containers, simulators, OpenAlex) return fixture data. Switched via `--mock-mode` flag or `FACTORY_MOCK=1` env var. Every CI integration test runs in mock mode. → `ARCHITECTURE.md §1.2`
 
+### Multi-Turn ReAct
+Agent loop pattern where one turn = one LLM↔tool exchange. Tools emit fenced ```` ```tool_call ```` JSON envelopes; tool results return as ```` ```tool_result[c-N-i] ```` fences. Spec 008 uses 25 turns per cycle with the 8-tool surface. → `specs/008-generator-verifier.md §5`
+
 ### Novelty / Correctness Inversion
 Failure mode: truly novel findings contradict the grounding literature by construction. Defense: publishable contradiction triggers an *intensified* G4 + adversarial council probe (not rejection); the decision to publish externally sits at G6 with a human. → `SPEC.md §10.5`
 
 ### Numerical Gullibility
 Failure mode: LLMs evaluate formulas linguistically (elegant, novel, well-cited) rather than numerically. A council can unanimously approve a formula none of the models can actually simulate. Defense: G2.5 tractability dry-run + G3 surrogate + G4 portfolio. → `SPEC.md §10.2`
+
+### notes.md
+The agent's own reasoning markdown (≤64KB) persisted via the `write_notes` tool inside the multi-turn loop. Survives compactions (the summarizer keeps `notes.md` outside the message history). Promoted to `runs/<cycle-id>/artifacts/notes.md` on cycle terminal. → `specs/008-generator-verifier.md §3`
 
 ### Oracle Gate
 The full-fidelity simulator run — the most expensive rung of the fidelity ladder. OOD candidates at G3 bypass the surrogate and escalate directly to oracle. → `SPEC.md §1.5`, `SPEC.md §4 G3`
@@ -373,6 +385,9 @@ Mandatory at G3: candidates whose surrogate inputs are out-of-distribution canno
 
 ### OpenRouter
 Unified LLM gateway used by the factory. All factory LLM access — council deliberation (4 frontier vendors) **and** every agentic call (`google/gemini-3.5-flash`) — routes through `https://openrouter.ai/api/v1` via the OpenAI-compatible SDK using a single env var: `OPENROUTER_API_KEY`. Optional ranking headers `HTTP-Referer` and `X-OpenRouter-Title: ai-co-computational-physicist` are set per call. Model IDs use `<vendor>/<model-id>` format. Reference: https://openrouter.ai/docs. → `FIX_PLAN.md §25` (§25 SUPERSEDES §24)
+
+### OpenRouterClient
+The single shared LLM client — the concrete `DecisionClient` Protocol implementation backed by the `openai` SDK with `base_url="https://openrouter.ai/api/v1"`. Reads `OPENROUTER_API_KEY` from the env. Used by every LLM-touching module (specs 001, 007, 008, 010, 011, 016) and re-exported as `from factory.llm_client import OpenRouterClient`. → `specs/018-openrouter-client.md`, `FIX_PLAN.md §27.2`
 
 ### OSI-Approved License
 Open Source Initiative-approved licenses (MIT, BSD-{2,3}, Apache-2.0, GPL-{2,3}, LGPL, MPL-2.0, ISC, etc.). *All* runtime dependencies must also be OSI-approved or freely redistributable inside the container. Required for Catalog entry. → `SPEC.md §5.1`
@@ -387,7 +402,7 @@ The required content of `CouncilVerdict.preserved_dissents[]`. Each entry: model
 Required tuple inside every `EvidenceLedgerEntry`: `code_hash`, `env_hash`, `input_hash`, `seed`, `simulator_id`, `simulator_version`, `container_sha`. Missing hashes raise `ProvenanceIncomplete`. → `SPEC.md §1.8`, `specs/002-artifacts.md §3`
 
 ### Provenance Hash
-SHA-256 over canonical JSON of an artifact (excluding the `provenance_hash` field itself). Filename in artifact store, identity in references, and the durability boundary. Re-running with same inputs + seed must reproduce the same hash. → `ARCHITECTURE.md §1.8`, `specs/002-artifacts.md §5.1`
+SHA-256 over canonical JSON of an artifact (excluding `provenance_hash` and `created_at`). Filename in artifact store, identity in references, and the durability boundary. Re-running with same inputs + seed must reproduce the same hash. → `ARCHITECTURE.md §1.8`, `specs/002-artifacts.md §5.1`
 
 ### Re-Litigation
 Permitted only with new evidence. An `EvidenceLedgerEntry` carries `relitigate_if[]` triggers (e.g., "simulator updated", "surrogate retrained", "iteration_cap raised"). G0 dedup lookup checks `currently_satisfied`. → `SPEC.md §1.7`, `specs/002-artifacts.md §3`, `specs/008-generator-verifier.md §5.9`
@@ -414,13 +429,16 @@ Per-iteration directory at `runs/<cycle-id>/sandbox/<iteration:03d>/` containing
 Persistent record of all attempted approaches (operator families) with reward / surprise / feasibility-distance EMAs, UCT scoring, MAP-Elites cells (Phase B), and lineage selection for parallel branches. Module: `factory/strategy/` (spec 016). Reference implementation: the proxima harness (`harness/beliefs.py`, `harness/strategy_config.py`, `harness/strategy_selection.py`, `harness/strategy_evidence.py`). Public surface: `StrategyArchive.{attribute_surprise, attribute_reward, select_lineages, add_strategy, transfer_priors_from}`. → `specs/016-strategy-archive.md`, `FIX_PLAN.md §26.2`
 
 ### Sycophancy / Groupthink
-Failure mode: council calls trained on the same backbone agree without genuine disagreement. Defense (restored multi-vendor): **vendor heterogeneity** (4 frontier vendors via OpenRouter — `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1`, `x-ai/grok-4.3`) **+** persona heterogeneity (Visionary / Pessimist / Pragmatist) **+** anonymized cross-review **+** dissent-preserving chairman. Vendor heterogeneity is the primary defense; persona is orthogonal reinforcement. `CouncilSycophancyDetected` threshold returns to **0.85** (max pairwise cosine). → `SPEC.md §10.1`, `FIX_PLAN.md §25.4` (§25 SUPERSEDES §24)
+Failure mode: council calls trained on the same backbone agree without genuine disagreement. Defense (restored multi-vendor): **vendor heterogeneity** (4 frontier vendors via OpenRouter — `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1-pro-preview`, `x-ai/grok-4.3`) **+** persona heterogeneity (Visionary / Pessimist / Pragmatist) **+** anonymized cross-review **+** dissent-preserving chairman. Vendor heterogeneity is the primary defense; persona is orthogonal reinforcement. `CouncilSycophancyDetected` threshold returns to **0.85** (max pairwise cosine). → `SPEC.md §10.1`, `FIX_PLAN.md §25.4` (§25 SUPERSEDES §24)
 
 ### Sycophancy Calibration
 `Council.calibrate(probe_set)` runs the multi-vendor lineup against the built-in probe set + ≥5 operator-supplied domain-specific probes, computes `max` pairwise cosine similarity, reports overall disagreement-rate. Live operations require disagreement-rate **≥ 0.40** (restored from §24's 0.25 once multi-vendor heterogeneity returned). Above `sycophancy_threshold` (default **0.85**) raises `CouncilSycophancyDetected`. → `specs/001-council.md §5.4`, `specs/001-council.md §5.5`, `FIX_PLAN.md §25.4` (§25 SUPERSEDES §24)
 
 ### Three-Stage Deliberation
-Council protocol: (1) First Opinions — each (model × persona) cell answers independently; (2) Anonymized Cross-Review — each cell critiques and ranks others; (3) Chairman Synthesis — chairman emits `CouncilVerdict` with preserved dissent. → `SPEC.md §3.2`, `specs/001-council.md §5`
+Council protocol: (1) First Opinions — each vendor model answers once under its assigned persona; (2) Anonymized Cross-Review — each response critiques and ranks others; (3) Chairman Synthesis — chairman emits `CouncilVerdict` with preserved dissent. → `SPEC.md §3.2`, `specs/001-council.md §5`
+
+### Tool Surface (8 tools)
+The Generator-Verifier multi-turn loop exposes exactly eight tools: `query_db`, `read_file`, `list_files`, `run_python`, `write_candidate`, `write_notes`, `done`, `stop_run`. Each has explicit safety invariants (SELECT-only sqlglot allowlist for `query_db`; `O_NOFOLLOW` + realpath under `runs/<cycle-id>/` for `read_file`; AST + import-whitelist sandbox for `run_python`; etc.). → `specs/008-generator-verifier.md §3`
 
 ### Tractability Dry-Run
 G2.5 mechanism: one-iteration run of the proposed solver mutation on a toy problem through the Generator-Verifier loop. Static analysis alone is forbidden. Failure marks hypothesis `intractable`. → `SPEC.md §4 G2.5`

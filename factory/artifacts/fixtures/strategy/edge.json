@@ -1,0 +1,20 @@
+{
+  "artifact_type": "Strategy",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "517ead6843a41b00ebb7fd1a815e607d0fd028f38f26926d35b56a7c5f834b2f",
+  "parent_hashes": [],
+  "sha": "0000000000000000000000000000000000000000000000000000000000000000",
+  "summary_md": "",
+  "kind": "library",
+  "parent_shas": [],
+  "reward_ema": null,
+  "surprise_ema": null,
+  "feasibility_distance_ema": null,
+  "feasible_count": 0,
+  "visits": 0,
+  "behavior_descriptor": {
+    "vector": [],
+    "cell_id": null
+  },
+  "provenance": "agent_authored"
+}

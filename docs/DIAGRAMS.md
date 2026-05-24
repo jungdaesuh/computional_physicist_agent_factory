@@ -190,7 +190,7 @@ sequenceDiagram
     participant CO as factory.council<br/>(spec 001)
     participant M1 as openai/gpt-5.5 · Visionary<br/>(via OpenRouter)
     participant M2 as anthropic/claude-opus-4.7 · Pessimist<br/>(via OpenRouter)
-    participant M3 as google/gemini-3.1 · Pessimist<br/>(via OpenRouter)
+    participant M3 as google/gemini-3.1-pro-preview · Pessimist<br/>(via OpenRouter)
     participant M4 as x-ai/grok-4.3 · Pragmatist<br/>(via OpenRouter)
     participant CH as Chairman<br/>(persona-rotated per session)
 
@@ -207,7 +207,7 @@ sequenceDiagram
         CO->>M2: chat.completions.create(model=anthropic/claude-opus-4.7, system=Pessimist, user=question)
         M2-->>CO: opinion_2
     and
-        CO->>M3: chat.completions.create(model=google/gemini-3.1, system=Pessimist, user=question)
+        CO->>M3: chat.completions.create(model=google/gemini-3.1-pro-preview, system=Pessimist, user=question)
         M3-->>CO: opinion_3
     and
         CO->>M4: chat.completions.create(model=x-ai/grok-4.3, system=Pragmatist, user=question)

@@ -1,0 +1,77 @@
+{
+  "$defs": {
+    "GapType": {
+      "description": "Types of literature gaps discovered by the Gap Miner.",
+      "enum": [
+        "structural_hole",
+        "methodology_transfer",
+        "contradiction",
+        "negative_result"
+      ],
+      "title": "GapType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A literature-derived research direction candidate.",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    },
+    "gap_type": {
+      "$ref": "#/$defs/GapType"
+    },
+    "rationale": {
+      "title": "Rationale",
+      "type": "string"
+    },
+    "source_papers": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Papers",
+      "type": "array"
+    },
+    "confidence": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "seed_query": {
+      "title": "Seed Query",
+      "type": "string"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash",
+    "gap_type",
+    "rationale",
+    "source_papers",
+    "confidence",
+    "seed_query"
+  ],
+  "title": "GapCandidate",
+  "type": "object"
+}

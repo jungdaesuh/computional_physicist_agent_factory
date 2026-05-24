@@ -1,0 +1,24 @@
+{
+  "artifact_type": "SurrogateProbeResult",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "b02fe3f9f32f5fcde2fed2ee94c8bfe4fb2dea13410bb7a82a2e98e88ce9ff50",
+  "parent_hashes": [
+    "fd308f833bb78227ac0804a6bbf97f803260211fb6e7d9ac0c42b6563d1dc3b7"
+  ],
+  "hypothesis_id": "HYP-001",
+  "experiment_spec_hash": "fd308f833bb78227ac0804a6bbf97f803260211fb6e7d9ac0c42b6563d1dc3b7",
+  "predicted_value": 0.015,
+  "uncertainty": {
+    "metric_name": "surrogate_residual",
+    "point_estimate": 0.015,
+    "ci_lower": 0.013,
+    "ci_upper": 0.017,
+    "ci_method": "t_interval",
+    "n_seeds": 1
+  },
+  "ood_flag": false,
+  "ood_distance_percentile": 42.0,
+  "pass_vs_baseline": "pass",
+  "surrogate_model_id": "surr-mlp-v1",
+  "feature_vector_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+}

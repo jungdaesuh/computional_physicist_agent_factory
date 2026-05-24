@@ -1,0 +1,14 @@
+[
+  {
+    "text": "Hello, this is typical response 1",
+    "model_id_actual": "google/gemini-3.5-flash",
+    "input_tokens": 10,
+    "output_tokens": 20
+  },
+  {
+    "text": "Hello, this is typical response 2",
+    "model_id_actual": "google/gemini-3.5-flash",
+    "input_tokens": 15,
+    "output_tokens": 25
+  }
+]

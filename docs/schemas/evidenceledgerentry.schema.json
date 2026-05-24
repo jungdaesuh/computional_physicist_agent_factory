@@ -1,0 +1,269 @@
+{
+  "$defs": {
+    "EvidenceResult": {
+      "description": "The four terminal results written to the Evidence Ledger.",
+      "enum": [
+        "passed",
+        "falsified",
+        "intractable",
+        "inconclusive"
+      ],
+      "title": "EvidenceResult",
+      "type": "string"
+    },
+    "ProvenanceBlock": {
+      "additionalProperties": false,
+      "description": "Records the exact reproducible lineage of code, simulator, and inputs.",
+      "properties": {
+        "code_hash": {
+          "title": "Code Hash",
+          "type": "string"
+        },
+        "env_hash": {
+          "title": "Env Hash",
+          "type": "string"
+        },
+        "input_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Input Hash",
+          "type": "string"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Seed"
+        },
+        "simulator_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Simulator Id"
+        },
+        "simulator_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Simulator Version"
+        },
+        "container_sha": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Container Sha"
+        }
+      },
+      "required": [
+        "code_hash",
+        "env_hash",
+        "input_hash",
+        "seed",
+        "simulator_id",
+        "simulator_version",
+        "container_sha"
+      ],
+      "title": "ProvenanceBlock",
+      "type": "object"
+    },
+    "RelitigationTrigger": {
+      "additionalProperties": false,
+      "description": "Trigger conditions for repeating experiments.",
+      "properties": {
+        "condition": {
+          "title": "Condition",
+          "type": "string"
+        },
+        "check_fn": {
+          "title": "Check Fn",
+          "type": "string"
+        },
+        "last_evaluated_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Last Evaluated At"
+        },
+        "currently_satisfied": {
+          "title": "Currently Satisfied",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "condition",
+        "check_fn",
+        "last_evaluated_at",
+        "currently_satisfied"
+      ],
+      "title": "RelitigationTrigger",
+      "type": "object"
+    },
+    "UncertaintyBlock": {
+      "additionalProperties": false,
+      "description": "Typed block representing statistical error estimates.",
+      "properties": {
+        "metric_name": {
+          "title": "Metric Name",
+          "type": "string"
+        },
+        "point_estimate": {
+          "title": "Point Estimate",
+          "type": "number"
+        },
+        "ci_lower": {
+          "title": "Ci Lower",
+          "type": "number"
+        },
+        "ci_upper": {
+          "title": "Ci Upper",
+          "type": "number"
+        },
+        "ci_method": {
+          "enum": [
+            "t_interval",
+            "bootstrap",
+            "bca"
+          ],
+          "title": "Ci Method",
+          "type": "string"
+        },
+        "n_seeds": {
+          "title": "N Seeds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "metric_name",
+        "point_estimate",
+        "ci_lower",
+        "ci_upper",
+        "ci_method",
+        "n_seeds"
+      ],
+      "title": "UncertaintyBlock",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A row inside the SQLite-backed Evidence Ledger, linking all provenance.",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    },
+    "hypothesis_id": {
+      "title": "Hypothesis Id",
+      "type": "string"
+    },
+    "result": {
+      "$ref": "#/$defs/EvidenceResult"
+    },
+    "terminal_state": {
+      "title": "Terminal State",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/ProvenanceBlock"
+    },
+    "uncertainty": {
+      "$ref": "#/$defs/UncertaintyBlock"
+    },
+    "relitigate_if": {
+      "items": {
+        "$ref": "#/$defs/RelitigationTrigger"
+      },
+      "title": "Relitigate If",
+      "type": "array"
+    },
+    "council_verdict_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Council Verdict Hashes",
+      "type": "array"
+    },
+    "run_report_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Run Report Hash"
+    },
+    "surprise_bits": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Surprise Bits"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash",
+    "hypothesis_id",
+    "result",
+    "terminal_state",
+    "provenance",
+    "uncertainty",
+    "relitigate_if",
+    "council_verdict_hashes",
+    "run_report_hash"
+  ],
+  "title": "EvidenceLedgerEntry",
+  "type": "object"
+}

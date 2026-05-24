@@ -1,0 +1,165 @@
+{
+  "$defs": {
+    "ControlDefinition": {
+      "additionalProperties": false,
+      "description": "Defines the baseline configurations for experimental comparison.",
+      "properties": {
+        "baseline_simulator_id": {
+          "title": "Baseline Simulator Id",
+          "type": "string"
+        },
+        "baseline_config": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "title": "Baseline Config",
+          "type": "object"
+        }
+      },
+      "required": [
+        "baseline_simulator_id",
+        "baseline_config"
+      ],
+      "title": "ControlDefinition",
+      "type": "object"
+    },
+    "FidelityTier": {
+      "additionalProperties": false,
+      "description": "Configuration for a single tier in the Multi-Fidelity Scheduler.",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "dry_run",
+            "surrogate",
+            "mid_fidelity",
+            "oracle",
+            "cross_simulator"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "cost_estimate_usd": {
+          "title": "Cost Estimate Usd",
+          "type": "number"
+        },
+        "expected_runtime_seconds": {
+          "title": "Expected Runtime Seconds",
+          "type": "number"
+        },
+        "kill_threshold": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Kill Threshold"
+        }
+      },
+      "required": [
+        "name",
+        "kind",
+        "cost_estimate_usd",
+        "expected_runtime_seconds",
+        "kill_threshold"
+      ],
+      "title": "FidelityTier",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Details of the simulator selection and experimental execution setup.",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    },
+    "hypothesis_id": {
+      "title": "Hypothesis Id",
+      "type": "string"
+    },
+    "simulator_id": {
+      "title": "Simulator Id",
+      "type": "string"
+    },
+    "control_definition": {
+      "$ref": "#/$defs/ControlDefinition"
+    },
+    "fidelity_ladder": {
+      "items": {
+        "$ref": "#/$defs/FidelityTier"
+      },
+      "title": "Fidelity Ladder",
+      "type": "array"
+    },
+    "seed_set": {
+      "items": {
+        "type": "integer"
+      },
+      "title": "Seed Set",
+      "type": "array"
+    },
+    "success_metric": {
+      "title": "Success Metric",
+      "type": "string"
+    },
+    "kill_criteria": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Kill Criteria",
+      "type": "array"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash",
+    "hypothesis_id",
+    "simulator_id",
+    "control_definition",
+    "fidelity_ladder",
+    "seed_set",
+    "success_metric",
+    "kill_criteria"
+  ],
+  "title": "ExperimentSpec",
+  "type": "object"
+}

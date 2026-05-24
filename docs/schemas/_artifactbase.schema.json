@@ -1,0 +1,35 @@
+{
+  "additionalProperties": false,
+  "description": "Common base model for all factory artifacts.\n\nEnforces immutability and content-addressable provenance hashing.",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash"
+  ],
+  "title": "_ArtifactBase",
+  "type": "object"
+}

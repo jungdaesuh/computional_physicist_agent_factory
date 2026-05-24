@@ -43,7 +43,7 @@ Logs use structured fields: `{ts, cycle_id, module, level, event, payload}`. No 
 
 ### 1.5 Every public interface is fully typed
 
-No `Any`. No untyped dictionaries. No implicit contracts. Pydantic models (or dataclasses with strict typing) at every module boundary. Type errors raise at the boundary, not later.
+No `Any`. No untyped dictionaries. No implicit contracts. Pydantic models (or dataclasses with strict typing) at every module boundary. Type errors raise at the boundary, not later. Every consumer of LLM access imports `from factory.llm_client import OpenRouterClient` for the live path and `FileClient` for fixture-replay testing — both implement the `DecisionClient` Protocol (spec 018), so drop-in swapping is type-checked at the boundary.
 
 **Test:** `mypy --strict factory/` passes. `pydantic.ValidationError` is the only exception type at module boundaries.
 
@@ -159,6 +159,12 @@ The layout enforces modular boundaries. New code goes in an existing module or a
 │   ├── fidelity/                   Spec 017 — multi-fidelity ladder scheduler (NEW)
 │   │   ├── scheduler.py
 │   │   └── tiers.py
+│   ├── llm_client/                 Spec 018 — shared OpenRouter LLM substrate (NEW)
+│   │   ├── api.py                  DecisionClient Protocol, OpenRouterClient
+│   │   ├── retry.py
+│   │   ├── rate_limit.py
+│   │   ├── mock.py                 FileClient + MockOpenRouterClient
+│   │   └── pricing.py              config/pricing/openrouter.yaml loader
 │   └── state_machine/              Spec 003 — gate orchestrator
 ├── tests/
 │   ├── unit/                       One subdir per factory/ module

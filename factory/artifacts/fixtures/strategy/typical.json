@@ -1,0 +1,23 @@
+{
+  "artifact_type": "Strategy",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "d136884504d5462f3f4ea8843a0272bda23a9227a0d3c571ecf18a9f7096b745",
+  "parent_hashes": [],
+  "sha": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "summary_md": "# A search strategy\nWe optimize parameters sequentially.",
+  "kind": "novel",
+  "parent_shas": [],
+  "reward_ema": 0.8,
+  "surprise_ema": 0.5,
+  "feasibility_distance_ema": 0.1,
+  "feasible_count": 5,
+  "visits": 10,
+  "behavior_descriptor": {
+    "vector": [
+      0.1,
+      0.2
+    ],
+    "cell_id": "cell-5"
+  },
+  "provenance": "hand_authored"
+}

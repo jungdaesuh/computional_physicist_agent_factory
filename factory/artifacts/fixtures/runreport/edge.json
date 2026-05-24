@@ -1,0 +1,16 @@
+{
+  "artifact_type": "RunReport",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "a103f4bf13d971216c0613716fac1b6319fd719d7da549930b8a7b73b00268ab",
+  "parent_hashes": [],
+  "hypothesis_id": "HYP-EDGE",
+  "title": "",
+  "abstract": "",
+  "latex_source": "",
+  "figure_paths": [],
+  "bibtex": "",
+  "embedded_council_verdict_hashes": [],
+  "g6_approved": false,
+  "g6_approver": null,
+  "g6_approved_at": null
+}

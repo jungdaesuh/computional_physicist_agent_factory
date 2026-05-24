@@ -1,0 +1,11 @@
+{
+  "artifact_type": "GapCandidate",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "ec711fe8edd76aed8f974353f109011534bb22428f5a67caec19053aeb97e31f",
+  "parent_hashes": [],
+  "gap_type": "negative_result",
+  "rationale": "Edge case with empty source papers and zero confidence.",
+  "source_papers": [],
+  "confidence": 0.0,
+  "seed_query": ""
+}

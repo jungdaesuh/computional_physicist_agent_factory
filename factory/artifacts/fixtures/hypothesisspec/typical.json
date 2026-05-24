@@ -1,0 +1,23 @@
+{
+  "artifact_type": "HypothesisSpec",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "ada26da85bd38c7fbdebfb8345437b86b463c9a4af9b2c8e6ae147fdb1b2d91a",
+  "parent_hashes": [
+    "f4c7df3f8f37eb6b892d220d61850bd1a684d68c8224b4dc01ba49e9326b421e"
+  ],
+  "hypothesis_id": "HYP-001",
+  "parent_gap_hash": "f4c7df3f8f37eb6b892d220d61850bd1a684d68c8224b4dc01ba49e9326b421e",
+  "if_then": "If we use a Richardson refinement ratio of 2, then MHD force balance error decreases.",
+  "measurable_metric": "force_balance_residual",
+  "expected_effect_size": -0.2,
+  "expected_effect_unit": "fractional change",
+  "confidence_interval": [
+    -0.3,
+    -0.1
+  ],
+  "kill_criteria": [
+    "force_balance_residual > 1e-3"
+  ],
+  "pre_registered_metric": "force_balance_residual",
+  "qualified_track": false
+}

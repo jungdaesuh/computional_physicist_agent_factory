@@ -301,7 +301,7 @@ ruff check .
 mypy --strict factory/
 
 # Confirm import boundaries (available once Wave 2 W2-A declares the import-linter layered config)
-import-linter --config pyproject.toml
+lint-imports --config pyproject.toml
 ```
 
 ---

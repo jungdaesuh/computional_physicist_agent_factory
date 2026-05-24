@@ -474,12 +474,12 @@ factory budget show
 **Expected output (aggregate):**
 ```
 aggregate budget:
-  aggregate_cap_usd: $1000.00 (lifetime)
+  aggregate_cap_usd: $500.00 (lifetime)
   aggregate_spent_usd: $147.18
-  daily_cap_usd: $50.00
+  daily_cap_usd: $100.00
   daily_spent_usd: $12.47
-  daily_remaining_usd: $37.53
-  per_hypothesis_default_usd: $50.00
+  daily_remaining_usd: $87.53
+  per_hypothesis_default_usd: $100.00
 ```
 
 **Example (per-hypothesis):**
@@ -524,15 +524,15 @@ factory budget set --aggregate-usd USD [--per-hypothesis-usd USD] [--daily-usd U
 
 **Example:**
 ```bash
-factory budget set --aggregate-usd 1000.00 --daily-usd 100.00 --per-hypothesis-usd 2.00
+factory budget set --aggregate-usd 750.00 --daily-usd 125.00 --per-hypothesis-usd 80.00
 ```
 
 **Expected output:**
 ```
 budget caps updated
-  aggregate_cap_usd:       $500.00 -> $1000.00
-  daily_cap_usd:           $50.00  -> $100.00
-  per_hypothesis_cap_usd:  $1.00   -> $2.00
+  aggregate_cap_usd:       $500.00 -> $750.00
+  daily_cap_usd:           $100.00 -> $125.00
+  per_hypothesis_cap_usd:  $100.00 -> $80.00
   control_event_hash: f9e8d7c...
   effective immediately
 ```

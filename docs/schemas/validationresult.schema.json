@@ -1,0 +1,213 @@
+{
+  "$defs": {
+    "CheckOutcome": {
+      "additionalProperties": false,
+      "description": "The result of a single physical invariance or numerical check.",
+      "properties": {
+        "check_name": {
+          "title": "Check Name",
+          "type": "string"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "residual": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Residual"
+        },
+        "tolerance": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tolerance"
+        },
+        "skipped": {
+          "title": "Skipped",
+          "type": "boolean"
+        },
+        "rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rationale"
+        }
+      },
+      "required": [
+        "check_name",
+        "passed",
+        "residual",
+        "tolerance",
+        "skipped",
+        "rationale"
+      ],
+      "title": "CheckOutcome",
+      "type": "object"
+    },
+    "CrossSimulatorComparison": {
+      "additionalProperties": false,
+      "description": "Outcome of comparing results against a secondary simulator.",
+      "properties": {
+        "paired_simulator_id": {
+          "title": "Paired Simulator Id",
+          "type": "string"
+        },
+        "observable": {
+          "title": "Observable",
+          "type": "string"
+        },
+        "delta": {
+          "title": "Delta",
+          "type": "number"
+        },
+        "tolerance": {
+          "title": "Tolerance",
+          "type": "number"
+        },
+        "tolerance_kind": {
+          "enum": [
+            "relative",
+            "absolute",
+            "mixed"
+          ],
+          "title": "Tolerance Kind",
+          "type": "string"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "paired_simulator_id",
+        "observable",
+        "delta",
+        "tolerance",
+        "tolerance_kind",
+        "passed"
+      ],
+      "title": "CrossSimulatorComparison",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Full suite verification result (G4).",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    },
+    "hypothesis_id": {
+      "title": "Hypothesis Id",
+      "type": "string"
+    },
+    "experiment_spec_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Experiment Spec Hash",
+      "type": "string"
+    },
+    "per_check_outcomes": {
+      "items": {
+        "$ref": "#/$defs/CheckOutcome"
+      },
+      "title": "Per Check Outcomes",
+      "type": "array"
+    },
+    "residuals": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Residuals",
+      "type": "object"
+    },
+    "tolerances": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Tolerances",
+      "type": "object"
+    },
+    "cross_simulator_comparison": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CrossSimulatorComparison"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reweighted_for_missing_cross_sim": {
+      "title": "Reweighted For Missing Cross Sim",
+      "type": "boolean"
+    },
+    "overall_verdict": {
+      "enum": [
+        "pass",
+        "fail",
+        "inconclusive"
+      ],
+      "title": "Overall Verdict",
+      "type": "string"
+    },
+    "input_hashes_used": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Input Hashes Used",
+      "type": "array"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash",
+    "hypothesis_id",
+    "experiment_spec_hash",
+    "per_check_outcomes",
+    "residuals",
+    "tolerances",
+    "cross_simulator_comparison",
+    "reweighted_for_missing_cross_sim",
+    "overall_verdict",
+    "input_hashes_used"
+  ],
+  "title": "ValidationResult",
+  "type": "object"
+}

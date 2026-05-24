@@ -1,0 +1,59 @@
+{
+  "additionalProperties": false,
+  "description": "Approved simulator families and physical regimes.",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    },
+    "allowed_domains": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Allowed Domains",
+      "type": "array"
+    },
+    "allowed_simulator_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Allowed Simulator Ids",
+      "type": "array"
+    },
+    "expansion_criteria": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Expansion Criteria",
+      "type": "array"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash",
+    "allowed_domains",
+    "allowed_simulator_ids",
+    "expansion_criteria"
+  ],
+  "title": "DomainScope",
+  "type": "object"
+}

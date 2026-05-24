@@ -1,0 +1,18 @@
+{
+  "artifact_type": "DomainScope",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "43e5c25ec07e51e20466837dfba774a5ace19c8622c74a68479845ddf95099ea",
+  "parent_hashes": [],
+  "allowed_domains": [
+    "stellarator-mhd",
+    "fluid-dynamics"
+  ],
+  "allowed_simulator_ids": [
+    "desc",
+    "vmec",
+    "su2"
+  ],
+  "expansion_criteria": [
+    "proven_analytical_benchmark"
+  ]
+}

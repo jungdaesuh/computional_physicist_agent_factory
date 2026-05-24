@@ -1,0 +1,21 @@
+{
+  "artifact_type": "HypothesisSpec",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "5ea66530ea03b7df6b067407e78a1d499ad1a41fc1345e03f8a646d404ea5212",
+  "parent_hashes": [
+    "ec711fe8edd76aed8f974353f109011534bb22428f5a67caec19053aeb97e31f"
+  ],
+  "hypothesis_id": "HYP-EDGE",
+  "parent_gap_hash": "ec711fe8edd76aed8f974353f109011534bb22428f5a67caec19053aeb97e31f",
+  "if_then": "If x then y.",
+  "measurable_metric": "metric",
+  "expected_effect_size": 0.0,
+  "expected_effect_unit": "unit",
+  "confidence_interval": [
+    0.0,
+    0.0
+  ],
+  "kill_criteria": [],
+  "pre_registered_metric": "metric",
+  "qualified_track": true
+}

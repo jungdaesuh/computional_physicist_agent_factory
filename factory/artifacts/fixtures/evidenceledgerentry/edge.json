@@ -1,0 +1,30 @@
+{
+  "artifact_type": "EvidenceLedgerEntry",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "92e4fc76452ae410acfceb0e77c057a081edfc5b51ed8b1b6cdfa203725f5810",
+  "parent_hashes": [],
+  "hypothesis_id": "HYP-EDGE",
+  "result": "intractable",
+  "terminal_state": "terminate_intractable",
+  "provenance": {
+    "code_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "env_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "input_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "seed": null,
+    "simulator_id": null,
+    "simulator_version": null,
+    "container_sha": null
+  },
+  "uncertainty": {
+    "metric_name": "dummy",
+    "point_estimate": 0.0,
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "ci_method": "t_interval",
+    "n_seeds": 1
+  },
+  "relitigate_if": [],
+  "council_verdict_hashes": [],
+  "run_report_hash": null,
+  "surprise_bits": null
+}

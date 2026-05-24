@@ -67,14 +67,14 @@ The Writer is *not* a fact-checker, novelty arbitrator, or peer reviewer. Those 
 
 > Skeleton-level: signatures are the contract. Bodies are TODO. Prompt-template content for the drafting LLM is also TODO and tuned during PRD-002/003.
 
-> **LLM access (FIX_PLAN §25.2).** Section drafting uses the shared OpenRouter client
-> (`openai` SDK, base URL `https://openrouter.ai/api/v1`) with
-> `model="google/gemini-3.5-flash"`. There is no Gemini-direct SDK import; the only
-> LLM env var is `OPENROUTER_API_KEY`. Cost + tokens are populated from the
-> OpenRouter response's `usage` block and passed to `BudgetTracker.record(...)`.
-> (§25 supersedes §24's Gemini-only constraint; council multi-vendor is restored in
-> spec 001, but section drafting remains single-model — `google/gemini-3.5-flash`
-> is the cheap agentic default.)
+> **LLM access (FIX_PLAN §27.2).** Section drafting uses
+> `from factory.llm_client import OpenRouterClient` (spec 018) with
+> `model="google/gemini-3.5-flash"`. No `openai`-SDK import lives in this module —
+> the shared client owns the base URL, env var (`OPENROUTER_API_KEY`), retry / pricing /
+> rate-limit policy. Cost + tokens are populated from `OpenRouterResponse.cost_usd` +
+> `.input_tokens` + `.output_tokens` and passed to `BudgetTracker.record(...)`.
+> (§27 layers spec 018 on top of §25's single-env-var invariant; section drafting
+> remains single-model — `google/gemini-3.5-flash` is the cheap agentic default.)
 
 ```python
 # factory/writer/api.py

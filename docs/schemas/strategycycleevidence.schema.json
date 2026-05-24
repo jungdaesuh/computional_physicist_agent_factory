@@ -1,0 +1,109 @@
+{
+  "$defs": {
+    "ConstraintOvershootStats": {
+      "additionalProperties": false,
+      "description": "Summarizes physical or technical boundary violations.",
+      "properties": {
+        "n_violating": {
+          "title": "N Violating",
+          "type": "integer"
+        },
+        "mean_overshoot": {
+          "title": "Mean Overshoot",
+          "type": "number"
+        },
+        "min_overshoot": {
+          "title": "Min Overshoot",
+          "type": "number"
+        }
+      },
+      "required": [
+        "n_violating",
+        "mean_overshoot",
+        "min_overshoot"
+      ],
+      "title": "ConstraintOvershootStats",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Aggregated experimental evidence returned from a cycle run.",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    },
+    "strategy_sha": {
+      "title": "Strategy Sha",
+      "type": "string"
+    },
+    "cycle_id": {
+      "title": "Cycle Id",
+      "type": "string"
+    },
+    "best_objective": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Best Objective"
+    },
+    "best_feasibility_distance": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Best Feasibility Distance"
+    },
+    "feasible_count": {
+      "title": "Feasible Count",
+      "type": "integer"
+    },
+    "constraint_overshoots": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ConstraintOvershootStats"
+      },
+      "title": "Constraint Overshoots",
+      "type": "object"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash",
+    "strategy_sha",
+    "cycle_id",
+    "best_objective",
+    "best_feasibility_distance",
+    "feasible_count",
+    "constraint_overshoots"
+  ],
+  "title": "StrategyCycleEvidence",
+  "type": "object"
+}

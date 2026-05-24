@@ -1,0 +1,82 @@
+{
+  "additionalProperties": false,
+  "description": "Audit record for system operator command mutations.",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    },
+    "event_type": {
+      "enum": [
+        "pause",
+        "resume",
+        "approve",
+        "reject",
+        "abort"
+      ],
+      "title": "Event Type",
+      "type": "string"
+    },
+    "target_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Target Id"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Reason"
+    },
+    "operator": {
+      "title": "Operator",
+      "type": "string"
+    },
+    "invoked_at": {
+      "format": "date-time",
+      "title": "Invoked At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash",
+    "event_type",
+    "target_id",
+    "reason",
+    "operator",
+    "invoked_at"
+  ],
+  "title": "FactoryControlEvent",
+  "type": "object"
+}

@@ -1,0 +1,12 @@
+{
+  "artifact_type": "StrategyCycleEvidence",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "3d976036931da0b3b804f8742da969d06694485ce51440a2073ff4d7c15ac735",
+  "parent_hashes": [],
+  "strategy_sha": "0000000000000000000000000000000000000000000000000000000000000000",
+  "cycle_id": "cycle-empty",
+  "best_objective": null,
+  "best_feasibility_distance": null,
+  "feasible_count": 0,
+  "constraint_overshoots": {}
+}

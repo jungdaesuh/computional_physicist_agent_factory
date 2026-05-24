@@ -57,6 +57,14 @@ This module is the **cheap-probe substrate** of the factory: it sits between the
 
 ## 3. Public Interface
 
+> **LLM access (FIX_PLAN §27.2).** Surrogate `predict()` does **no** LLM call (cost = $0).
+> The only LLM-touching surface in this module is the optional OOD-audit prose generator
+> used during catastrophic-audit review, which goes through
+> `from factory.llm_client import OpenRouterClient` (spec 018) with
+> `model="google/gemini-3.5-flash"`. No `openai`-SDK import lives in this module — the
+> shared client owns the base URL, env var (`OPENROUTER_API_KEY`), retry / pricing /
+> rate-limit policy.
+
 ```python
 # factory/surrogate/api.py
 

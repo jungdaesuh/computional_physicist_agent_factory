@@ -1,0 +1,11 @@
+{
+  "artifact_type": "FactoryControlEvent",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "9cb6fb1d390dfc66b05e33dd87b0481c5328b063333d8aca7165b4066a7f0a69",
+  "parent_hashes": [],
+  "event_type": "resume",
+  "target_id": null,
+  "reason": null,
+  "operator": "system",
+  "invoked_at": "2026-05-23T12:11:00Z"
+}

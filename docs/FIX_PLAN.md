@@ -336,12 +336,11 @@ Drop `council/sessions/...` (legacy from spec 001 — overridden by the canonica
 | `OPENAI_API_KEY` | Council live mode | yes |
 | `GOOGLE_API_KEY` | Council live mode | yes |
 | `XAI_API_KEY` or `OPENROUTER_API_KEY` | 4th council vendor | yes |
-| `OPENALEX_MAILTO` | OpenAlex polite-pool email | recommended |
-| `OPENALEX_API_KEY` | Higher OpenAlex rate limit | optional |
+| `OPENALEX_API_KEY` | OpenAlex live literature discovery | yes |
 | `FACTORY_MOCK` | Force mock mode | no |
 | `FACTORY_CONFIG_DIR` | Override config dir | no |
 
-Drop `OPENALEX_EMAIL` — use `OPENALEX_MAILTO` everywhere.
+Drop `OPENALEX_EMAIL` and historical `OPENALEX_MAILTO` rate-limit handling — use `OPENALEX_API_KEY` everywhere.
 
 ---
 
@@ -502,7 +501,7 @@ Add to spec 010 §5.4:
 
 - Endpoint for forward citations: `/works?filter=cites:<work_id>` (canonical). Drop `cited_by_api_url` from the prose — it's a derivable URL pattern, not a Work-object field.
 - `is_oa` filter parameter is `is_oa=true` (top-level filter); within Work response, the field is `open_access.is_oa` (nested under `open_access`). Document the dual representation.
-- Pin `OPENALEX_MAILTO` (not `OPENALEX_EMAIL`).
+- Pin `OPENALEX_API_KEY`; `OPENALEX_EMAIL` and `OPENALEX_MAILTO` are not live request inputs.
 - Export `PaperStore` class from `factory.literature` public API. Define its public interface in §3 (`.query(...)`, `.get(work_id)`, `.get_bibtex(work_id)`, `.has_bibtex(work_id)`, `.promote(work_ids)`, plus mock).
 
 ---
@@ -810,7 +809,7 @@ def call_llm(
 | :--- | :--- | :--- |
 | Council slot 1 | `openai/gpt-5.5` | OpenAI vendor |
 | Council slot 2 | `anthropic/claude-opus-4.7` | Anthropic vendor |
-| Council slot 3 | `google/gemini-3.1` | Google vendor |
+| Council slot 3 | `google/gemini-3.1-pro-preview` | Google vendor |
 | Council slot 4 | `x-ai/grok-4.3` | xAI vendor |
 | Agentic default (code-gen, Gap Miner, RAG writer, OOD audit, telemetry digest) | `google/gemini-3.5-flash` | single cheap model |
 
@@ -880,7 +879,7 @@ models:
   "anthropic/claude-opus-4.7":
     input_per_1m_tokens_usd: <fill>
     output_per_1m_tokens_usd: <fill>
-  "google/gemini-3.1":
+  "google/gemini-3.1-pro-preview":
     input_per_1m_tokens_usd: <fill>
     output_per_1m_tokens_usd: <fill>
   "x-ai/grok-4.3":
@@ -1146,3 +1145,98 @@ Spec 016 + spec 017 are **fully specified now** but the Phase A deliverable uses
 - Spec 017: 3-tier ladder (DRY_RUN, SURROGATE, ORACLE). Phase B adds MID_FIDELITY + CROSS_SIMULATOR + active-learning surprise.
 
 The proxima harness's production config (graded surprise, multi-lineage, MAP-Elites) is the Phase B target.
+
+---
+
+## 27. AMENDMENT (2026-05-23) — Spec 008 rewrite + new spec 018 OpenRouter Client
+
+The Crucible deeper-fidelity audit (see conversation thread "what about the stuff you pulled from") found that **spec 008 underspecifies the multi-turn architecture** relative to the proxima harness reference at `/Users/suhjungdae/code/software/proxima_fusion/ai-sci-feasible-designs/harness/`. The proxima harness ships a richer 25-turn ReAct loop with an 8-tool surface, LLM-driven compaction, and agent self-notes. The new factory should drop-in this architecture on top of `google/gemini-3.5-flash` via OpenRouter.
+
+### 27.1 Spec 008 rewrite — adopt proxima `turn_loop.py` architecture
+
+Reference: `/Users/suhjungdae/code/software/proxima_fusion/ai-sci-feasible-designs/harness/turn_loop.py`, `tools.py`, `compaction.py`, `governor.py`.
+
+Replace spec 008's linear-iteration model with:
+
+- **`MAX_TURNS = 25`** per cycle (replaces "10 iterations"). One turn = one LLM↔tool exchange; a turn can contain multiple parallel tool calls.
+- **`AUTO_COMPACT_TOKEN_LIMIT = 200_000`**. When message-history tokens cross this threshold, a summarization LLM call replaces history with a summary, allowing long cycles without OOM.
+- **8-tool ReAct surface** (matches proxima exactly):
+  - `query_db(sql)` — SELECT-only against the EvidenceLedger; sqlglot allowlist + read-only URI conn + 30s signal timeout + 256KB result cap + LIMIT 1000 auto-inject.
+  - `read_file(path)` — `os.open(O_NOFOLLOW)` + realpath check under `runs/<cycle-id>/`.
+  - `list_files(glob)` — glob under `runs/<cycle-id>/`; symlinks dropped.
+  - `run_python(code)` — subprocess-level sandbox with `RLIMIT_AS` + AST + import-whitelist.
+  - `write_candidate(filename, boundary)` — canonicalize + write to `staging/`.
+  - `write_notes(content)` — ≤64KB to `staging/notes.md`; agent's own reasoning persists across compactions.
+  - `done(reason)` — sets `session.done = True`; current turn finishes; loop exits.
+  - `stop_run(reason)` — writes `runs/<cycle-id>/STOP`; outer state machine halts continuous operation.
+- **ReAct text-fence protocol** (```` ```tool_call ```` and ```` ```tool_result[c-N-i] ```` ). Works on any text-completion API including OpenRouter. Optionally migrate to native OpenAI `tools=` later (OpenRouter passes through the schema), but text fences stay as the canonical Phase A protocol for parser stability across models.
+- **Atomic all-or-none promotion** (proxima's `promote.py` pattern): validate every staged candidate (canonicalize + sanitize); promote all OR preserve staging on failure for debugging. Track `skipped_duplicate_count` vs `skipped_invalid_count` separately.
+- **Cold-start pre-stage** (proxima's `cold_start.py`): when no evaluated candidates exist on cycle 0, the factory pre-stages 3 seed candidates from a fixture or HF dataset row. Idempotent; only on cycle 0.
+- **STOP-file polling** between cycles (proxima's governor pattern). The outer state machine (spec 003) checks for `runs/STOP` between cycles and halts if present.
+- **`refresh_state` callback per turn** — re-renders state pointers from current sandbox state. Prevents the agent from operating on stale state across turns.
+- **Token-budget tracker** — `estimate_tokens(messages)` ≈ word count × 1.3; triggers compaction at 200k.
+- **Recorder schema additions** (already partially in spec 012): `harness_version`, `skipped_duplicate_count`, `skipped_invalid_count`, `progress_kind` ∈ {first_feasible, improved, regressed, flat}, `feasibility_delta`, taxonomized `error_type` values (`compaction_failed`, `oauth_refresh_failed` → renamed `openrouter_auth_failed`, `max_turns_no_output`, `candidate_validation_failed`, `llm_invoke_failed`).
+
+The architectural unit is **the turn**, not the iteration. A cycle is up to 25 turns. The agent may emit multiple `write_candidate` tool calls in a single turn (parallel candidate proposals). The loop terminates on: agent calls `done`, agent calls `stop_run`, agent replies with no tool calls, or `MAX_TURNS` reached.
+
+Spec 008 is renamed in its CONTEXT block from "Generator-Verifier Loop" to "Multi-Turn Agent Loop" to reflect the richer architecture. Module path stays `factory/genver/`.
+
+### 27.2 New spec 018 — OpenRouter Client (shared LLM substrate)
+
+The single shared LLM client used by everything. Module path: `factory/llm_client/`.
+
+Reference: `/Users/suhjungdae/code/software/proxima_fusion/ai-sci-feasible-designs/harness/decision_client.py` (the proxima reference; substitute the Codex OAuth client with an OpenRouter Bearer-token client).
+
+Public API:
+
+```python
+class TransientAPIError(Exception): ...
+class OpenRouterAuthError(Exception): ...
+class OpenRouterRateLimitError(TransientAPIError): ...
+class OpenRouterConnectError(TransientAPIError): ...
+
+class DecisionClient(Protocol):
+    """Synchronous LLM client; one round-trip per call."""
+    def invoke(self, messages: list[dict], *, model: str, max_tokens: int = 4096, response_format: dict | None = None) -> "OpenRouterResponse": ...
+
+class OpenRouterClient:
+    """Concrete DecisionClient backed by openai SDK + base_url override."""
+    def __init__(self, api_key: str | None = None) -> None: ...        # reads OPENROUTER_API_KEY if api_key None
+    def invoke(self, messages, *, model, max_tokens=4096, response_format=None) -> "OpenRouterResponse": ...
+
+class RateLimitedDecisionClient:
+    """Wraps any DecisionClient with a process-wide token-bucket rate limiter (proxima pattern)."""
+    def __init__(self, inner: DecisionClient, rps: float = 5.0) -> None: ...
+    def invoke(self, *args, **kwargs) -> "OpenRouterResponse": ...
+
+class FileClient:
+    """Mock client that replays a fixture; used by tests."""
+    def __init__(self, transcript_path: Path) -> None: ...
+    def invoke(self, *args, **kwargs) -> "OpenRouterResponse": ...
+
+@dataclass(frozen=True)
+class OpenRouterResponse:
+    text: str
+    model_id_actual: str        # may differ from request if OpenRouter routes
+    input_tokens: int
+    output_tokens: int
+    cost_usd: float             # computed from pricing table (FIX_PLAN §25.6)
+```
+
+Invariants:
+- Single env var `OPENROUTER_API_KEY`.
+- Base URL `https://openrouter.ai/api/v1`.
+- Ranking headers `HTTP-Referer` (config) + `X-OpenRouter-Title: ai-co-computational-physicist`.
+- USD computed from response `usage.prompt_tokens` + `usage.completion_tokens` × `config/pricing/openrouter.yaml`.
+- No `temperature` / `top_p` / `top_k` override by default.
+- Backoff + retry on `TransientAPIError` (rate limit, 5xx, connection error); refuse retry on `OpenRouterAuthError`.
+
+Consumers (specs 001 council, 007 literature, 008 genver, 011 writer, 016 strategy archive) all import `from factory.llm_client import OpenRouterClient` and use the same shared instance via dependency injection.
+
+### 27.3 Files affected
+
+- **REWRITE:** `specs/008-generator-verifier.md` — adopt §27.1 architecture.
+- **NEW:** `specs/018-openrouter-client.md` — full spec per §27.2.
+- **UPDATE:** `specs/001-council.md`, `specs/007-literature-discovery.md`, `specs/010-surrogate-models.md`, `specs/011-rag-writer.md`, `specs/016-strategy-archive.md` — replace inline client code with `from factory.llm_client import OpenRouterClient`.
+- **UPDATE:** `INDEX.md` (spec table + dependency graph), `ARCHITECTURE.md` (add `factory/llm_client/` to repo layout), `GLOSSARY.md` (add `OpenRouterClient`, `DecisionClient Protocol`, `Multi-Turn ReAct`, `Tool Surface`, `Compaction`, `notes.md` entries), `SPEC.md` (mention spec 018 as the LLM substrate).
+- **UPDATE:** `prds/PRD-001-phase-a-mvp.md` — add spec 018 to acceptance list (15 → 17 specs total now with 016 + 017 + 018).

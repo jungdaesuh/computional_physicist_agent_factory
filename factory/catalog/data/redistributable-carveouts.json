@@ -1,0 +1,10 @@
+{
+  "carve_outs": [
+    {
+      "package": "mock-data-dep",
+      "version_range": ">=1.0",
+      "license": "CC-BY-4.0",
+      "rationale": "CC-BY-4.0 is acceptable for non-code lookup tables or basis sets."
+    }
+  ]
+}

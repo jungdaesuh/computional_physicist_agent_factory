@@ -1,0 +1,105 @@
+{
+  "$defs": {
+    "BudgetLedgerEntry": {
+      "additionalProperties": false,
+      "description": "A recorded entry of token or monetary spend.",
+      "properties": {
+        "ts": {
+          "format": "date-time",
+          "title": "Ts",
+          "type": "string"
+        },
+        "module": {
+          "title": "Module",
+          "type": "string"
+        },
+        "cost_usd": {
+          "title": "Cost Usd",
+          "type": "number"
+        },
+        "tokens": {
+          "title": "Tokens",
+          "type": "integer"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ts",
+        "module",
+        "cost_usd",
+        "tokens",
+        "description"
+      ],
+      "title": "BudgetLedgerEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The budget envelope for a single hypothesis run.",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    },
+    "hypothesis_id": {
+      "title": "Hypothesis Id",
+      "type": "string"
+    },
+    "dollar_cap": {
+      "title": "Dollar Cap",
+      "type": "number"
+    },
+    "wall_clock_cap_seconds": {
+      "title": "Wall Clock Cap Seconds",
+      "type": "number"
+    },
+    "token_cap": {
+      "title": "Token Cap",
+      "type": "integer"
+    },
+    "iteration_cap": {
+      "title": "Iteration Cap",
+      "type": "integer"
+    },
+    "running_ledger": {
+      "items": {
+        "$ref": "#/$defs/BudgetLedgerEntry"
+      },
+      "title": "Running Ledger",
+      "type": "array"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash",
+    "hypothesis_id",
+    "dollar_cap",
+    "wall_clock_cap_seconds",
+    "token_cap",
+    "iteration_cap"
+  ],
+  "title": "Budget",
+  "type": "object"
+}

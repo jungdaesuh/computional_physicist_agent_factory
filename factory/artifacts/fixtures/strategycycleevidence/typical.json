@@ -1,0 +1,20 @@
+{
+  "artifact_type": "StrategyCycleEvidence",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "7d463c96d672363c8879c8f9eb18c63e4106cf32b951929277dfdeb8bce0bd9b",
+  "parent_hashes": [
+    "d136884504d5462f3f4ea8843a0272bda23a9227a0d3c571ecf18a9f7096b745"
+  ],
+  "strategy_sha": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "cycle_id": "cycle-1",
+  "best_objective": 0.95,
+  "best_feasibility_distance": 0.02,
+  "feasible_count": 1,
+  "constraint_overshoots": {
+    "mhd": {
+      "n_violating": 1,
+      "mean_overshoot": 0.05,
+      "min_overshoot": 0.01
+    }
+  }
+}

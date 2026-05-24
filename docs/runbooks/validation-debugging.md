@@ -439,7 +439,7 @@ After applying any fix, confirm:
    ```
 5. **No-LLM-dependency contract holds.** `factory/validation/` must not import any LLM SDK; enforced by `import-linter`:
    ```bash
-   import-linter --config pyproject.toml
+   lint-imports --config pyproject.toml
    ```
 6. **Determinism preserved.** Re-running the same `(experiment, candidate)` produces the same `inputs_hash` and the same per-check pass/fail:
    ```bash

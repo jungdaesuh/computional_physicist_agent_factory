@@ -1,0 +1,15 @@
+{
+  "artifact_type": "ValidationResult",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "1e28f721974dd8e34e36aadeae676c23686c34d0a906523461bfa9a12c5e713d",
+  "parent_hashes": [],
+  "hypothesis_id": "HYP-EDGE",
+  "experiment_spec_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "per_check_outcomes": [],
+  "residuals": {},
+  "tolerances": {},
+  "cross_simulator_comparison": null,
+  "reweighted_for_missing_cross_sim": true,
+  "overall_verdict": "inconclusive",
+  "input_hashes_used": []
+}

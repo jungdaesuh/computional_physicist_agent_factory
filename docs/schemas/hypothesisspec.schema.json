@@ -1,0 +1,99 @@
+{
+  "additionalProperties": false,
+  "description": "A concretized, falsifiable hypothesis specification.",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    },
+    "hypothesis_id": {
+      "title": "Hypothesis Id",
+      "type": "string"
+    },
+    "parent_gap_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Parent Gap Hash",
+      "type": "string"
+    },
+    "if_then": {
+      "title": "If Then",
+      "type": "string"
+    },
+    "measurable_metric": {
+      "title": "Measurable Metric",
+      "type": "string"
+    },
+    "expected_effect_size": {
+      "title": "Expected Effect Size",
+      "type": "number"
+    },
+    "expected_effect_unit": {
+      "title": "Expected Effect Unit",
+      "type": "string"
+    },
+    "confidence_interval": {
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Confidence Interval",
+      "type": "array"
+    },
+    "kill_criteria": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Kill Criteria",
+      "type": "array"
+    },
+    "pre_registered_metric": {
+      "title": "Pre Registered Metric",
+      "type": "string"
+    },
+    "qualified_track": {
+      "default": false,
+      "title": "Qualified Track",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash",
+    "hypothesis_id",
+    "parent_gap_hash",
+    "if_then",
+    "measurable_metric",
+    "expected_effect_size",
+    "expected_effect_unit",
+    "confidence_interval",
+    "kill_criteria",
+    "pre_registered_metric"
+  ],
+  "title": "HypothesisSpec",
+  "type": "object"
+}

@@ -1,0 +1,12 @@
+{
+  "artifact_type": "Budget",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "d99e48e2935d3508a6fba279796a06fcfce67ff4f78ef879c1bdf89068f4904c",
+  "parent_hashes": [],
+  "hypothesis_id": "HYP-EDGE",
+  "dollar_cap": 0.0,
+  "wall_clock_cap_seconds": 0.0,
+  "token_cap": 0,
+  "iteration_cap": 0,
+  "running_ledger": []
+}

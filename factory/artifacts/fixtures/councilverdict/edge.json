@@ -1,0 +1,17 @@
+{
+  "artifact_type": "CouncilVerdict",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "bdb493502dc2d08bd31bad91f43251d7a481be5019109003864e0e0412f6f520",
+  "parent_hashes": [],
+  "council_id": "C5",
+  "question": "Q?",
+  "model_lineup": [],
+  "persona_assignment": {},
+  "chairman_model": "",
+  "majority_view": "",
+  "preserved_dissents": [],
+  "chairman_decision": "no_consensus",
+  "total_cost_usd": 0.0,
+  "wall_clock_seconds": 0.0,
+  "session_id": "session-empty"
+}

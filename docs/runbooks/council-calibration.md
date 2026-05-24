@@ -22,7 +22,7 @@ This is the **single most important early-validation gate of Phase A**. If the c
   - `models[]` — exactly 4 `ModelSpec` entries, one per vendor in FIX_PLAN §25.3:
     - `{openrouter_id: "openai/gpt-5.5", vendor: "openai", timeout_s: 60.0, max_tokens: 4096}`
     - `{openrouter_id: "anthropic/claude-opus-4.7", vendor: "anthropic", timeout_s: 60.0, max_tokens: 4096}`
-    - `{openrouter_id: "google/gemini-3.1", vendor: "google", timeout_s: 60.0, max_tokens: 4096}`
+    - `{openrouter_id: "google/gemini-3.1-pro-preview", vendor: "google", timeout_s: 60.0, max_tokens: 4096}`
     - `{openrouter_id: "x-ai/grok-4.3", vendor: "x-ai", timeout_s: 60.0, max_tokens: 4096}`
   - `persona_assignment` — mapping each model id → persona (`Visionary | Pessimist | Pragmatist`); the assignment must span ≥3 distinct personas. Rotation across cycles is permitted but the four vendors are fixed.
   - `chairman_policy` — `random | round_robin | weighted_by_cost`.

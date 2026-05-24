@@ -1,0 +1,8 @@
+[
+  {
+    "text": "fixture response",
+    "model_id_actual": "google/gemini-3.5-flash",
+    "input_tokens": 11,
+    "output_tokens": 7
+  }
+]

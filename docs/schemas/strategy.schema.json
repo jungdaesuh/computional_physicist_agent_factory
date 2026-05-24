@@ -1,0 +1,155 @@
+{
+  "$defs": {
+    "BehaviorDescriptor": {
+      "additionalProperties": false,
+      "description": "Behavior-space coordinates for diversity mapping (e.g. MAP-Elites).",
+      "properties": {
+        "vector": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Vector",
+          "type": "array"
+        },
+        "cell_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Cell Id"
+        }
+      },
+      "required": [
+        "vector",
+        "cell_id"
+      ],
+      "title": "BehaviorDescriptor",
+      "type": "object"
+    },
+    "StrategyKind": {
+      "description": "Categorization of how the strategy was created in the archive.",
+      "enum": [
+        "novel",
+        "mutate",
+        "crossover",
+        "library"
+      ],
+      "title": "StrategyKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Represents a search heuristic strategy in the archive.",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    },
+    "sha": {
+      "title": "Sha",
+      "type": "string"
+    },
+    "summary_md": {
+      "title": "Summary Md",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/StrategyKind"
+    },
+    "parent_shas": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Parent Shas",
+      "type": "array"
+    },
+    "reward_ema": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Reward Ema"
+    },
+    "surprise_ema": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Surprise Ema"
+    },
+    "feasibility_distance_ema": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Feasibility Distance Ema"
+    },
+    "feasible_count": {
+      "title": "Feasible Count",
+      "type": "integer"
+    },
+    "visits": {
+      "title": "Visits",
+      "type": "integer"
+    },
+    "behavior_descriptor": {
+      "$ref": "#/$defs/BehaviorDescriptor"
+    },
+    "provenance": {
+      "title": "Provenance",
+      "type": "string"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash",
+    "sha",
+    "summary_md",
+    "kind",
+    "parent_shas",
+    "reward_ema",
+    "surprise_ema",
+    "feasibility_distance_ema",
+    "feasible_count",
+    "visits",
+    "behavior_descriptor",
+    "provenance"
+  ],
+  "title": "Strategy",
+  "type": "object"
+}

@@ -1,0 +1,75 @@
+[project]
+name = "computational_physicist_factory"
+version = "0.1.0"
+description = "Autonomous Co-Computational Physicist Factory (Phase A MVP)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.10",
+    "openai>=1.0.0",
+    "pytest>=8.0.0",
+    "sqlglot>=20.0.0",
+    "sentence-transformers>=3.0.0",
+    "pyyaml>=6.0.0",
+    "import-linter>=2.0",
+    "ruff>=0.5.0",
+    "mypy>=1.10.0",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+]
+
+
+[project.scripts]
+factory = "factory.operator.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["factory"]
+
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "A", "C4", "SIM", "ARG"]
+ignore = [
+    # Several public exception names are spec terms and intentionally omit "Error".
+    "N818",
+]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+warn_unused_configs = true
+disallow_any_generics = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["factory", "tests"]
+addopts = "--import-mode=importlib"
+markers = [
+    "live: marks tests that make actual API calls to external services",
+]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.importlinter]
+root_package = "factory"
+
+[[tool.importlinter.contracts]]
+name = "Core layers"
+type = "layers"
+layers = [
+    "factory.operator",
+    "factory.state_machine",
+    "factory.genver",
+    "factory.council",
+    "factory.llm_client",
+    "factory.artifacts",
+]

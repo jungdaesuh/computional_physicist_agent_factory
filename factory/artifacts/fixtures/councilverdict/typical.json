@@ -1,0 +1,36 @@
+{
+  "artifact_type": "CouncilVerdict",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "5d9cbafea527018460ff193dbe5d6e6d02d3a6b962a474a78b070eed1d361536",
+  "parent_hashes": [
+    "ada26da85bd38c7fbdebfb8345437b86b463c9a4af9b2c8e6ae147fdb1b2d91a"
+  ],
+  "council_id": "C1",
+  "question": "Is HYP-001 worthy of simulation?",
+  "model_lineup": [
+    "openai/gpt-5.5",
+    "anthropic/claude-opus-4.7",
+    "google/gemini-3.1-pro-preview",
+    "x-ai/grok-4.3"
+  ],
+  "persona_assignment": {
+    "openai/gpt-5.5": "visionary",
+    "anthropic/claude-opus-4.7": "pessimist",
+    "google/gemini-3.1-pro-preview": "pragmatist",
+    "x-ai/grok-4.3": "pessimist"
+  },
+  "chairman_model": "google/gemini-3.1-pro-preview",
+  "majority_view": "The hypothesis is highly worthy and well-grounded.",
+  "preserved_dissents": [
+    {
+      "model_id": "anthropic/claude-opus-4.7",
+      "persona": "pessimist",
+      "view": "There is potential for charge-sloshing numerical failures.",
+      "rationale": "Stellarator equilibrium simulators like VMEC struggle near rational surfaces."
+    }
+  ],
+  "chairman_decision": "qualified",
+  "total_cost_usd": 0.15,
+  "wall_clock_seconds": 12.4,
+  "session_id": "session-1234"
+}

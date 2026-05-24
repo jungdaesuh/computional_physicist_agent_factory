@@ -60,7 +60,7 @@ The factory is a researcher's tool, not a consumer product. Information density 
 >
 > Header: which council is this (C1 Worthiness / C2 Design / C3 Interpretation / C4 Peer Review / C5 Program Direction), the question put to the council in monospace blockquote form, the model lineup as a row of small chips (each chip showing model name + assigned persona, e.g., "Claude-Opus · Pessimist" / "GPT-5 · Visionary" / "Gemini · Pragmatist" / "Qwen-235B · Pessimist"), and the chairman model identified with a small crown-shaped icon (line drawing, 12px).
 >
-> Stage 1 — First Opinions: a horizontal scrollable row of expert-opinion cards, one per (model × persona) cell. Each card is ~320px wide, has the model+persona chip at top, full text of that cell's opinion in body, and a rank/score they self-assigned. Cards have a max collapsed height; "expand all" toggles full text inline.
+> Stage 1 — First Opinions: a horizontal scrollable row of expert-opinion cards, one per vendor model under its assigned persona. Each card is ~320px wide, has the model+persona chip at top, full text of that response in body, and a rank/score they self-assigned. Cards have a max collapsed height; "expand all" toggles full text inline.
 >
 > Stage 2 — Anonymized Cross-Review: a matrix. Rows are reviewers, columns are reviewees (both anonymized as "Voice A" / "Voice B" / etc.). Each matrix cell contains the rank the reviewer assigned, a 1-line critique excerpt, and a small "see full critique" expander. Below the matrix, a "Reveal Identities" toggle that maps Voice A → model+persona. Default is anonymized to match the deliberation protocol.
 >

@@ -9,6 +9,8 @@ This is the canonical specification for an autonomous research factory that:
 4. Validates results with a deterministic physics + statistics portfolio.
 5. Emits internally-published evidence (with a human gate before any external release).
 
+This document is intentionally reference-free. It is derived from a separate reference/provenance draft; implementation authority lives here and in `docs/specs/*.md`.
+
 The factory is **not** a "general physics AGI." It is a stateful research loop, bounded by a curated catalog of open-source simulators and a small set of explicit failure-mode defenses. Anything it cannot do, it must refuse cleanly.
 
 ---
@@ -61,7 +63,7 @@ The Strategy Archive (spec 016) is the **what-to-try-next substrate**: it tracks
 - **Call count and vendor lineup.** Exactly 4 independent calls per deliberation, one per vendor, via OpenRouter:
   - `openai/gpt-5.5`
   - `anthropic/claude-opus-4.7`
-  - `google/gemini-3.1`
+  - `google/gemini-3.1-pro-preview`
   - `x-ai/grok-4.3`
 
   Each call uses a fresh OpenAI-compatible `chat.completions.create` invocation with no shared chat history. A failure of any single vendor falls back to raising `CouncilError`; there is no silent substitution because vendor heterogeneity IS the defense. See `FIX_PLAN.md §25.3`.
@@ -74,8 +76,8 @@ The Strategy Archive (spec 016) is the **what-to-try-next substrate**: it tracks
 
 ### 3.2 Three-stage deliberation protocol
 
-1. **First Opinions.** Each (model × persona) cell answers independently.
-2. **Anonymized Cross-Review.** Each cell critiques and ranks the others' outputs with model identity stripped.
+1. **First Opinions.** Each vendor model answers once under its assigned persona.
+2. **Anonymized Cross-Review.** Each response critiques and ranks the others' outputs with model identity stripped.
 3. **Chairman Synthesis.** Chairman model produces a `CouncilVerdict` with **preserved dissent** — minority views and their rationale must survive into the verdict. A scalar Go/No-Go output is forbidden.
 
 ### 3.3 The five councils
@@ -322,7 +324,7 @@ Instead of relying on general LLM memory for the manuscript:
 The factory must explicitly defend against each of the following. These are not hypothetical — at least four have already been observed in prior agentic-science experiments.
 
 1. **Sycophancy / groupthink.** Council calls trained on the same backbone agree without genuine disagreement.
-   - *Defense (restored multi-vendor heterogeneity; §25 SUPERSEDES §24).* Two orthogonal diversity axes: **vendor heterogeneity** — 4 frontier models from 4 distinct vendors (`openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1`, `x-ai/grok-4.3`) routed via OpenRouter — **plus** **persona heterogeneity** (Visionary / Pessimist / Pragmatist) **+** anonymized cross-review **+** dissent-preserving chairman. Vendor heterogeneity is the primary defense; persona heterogeneity is orthogonal reinforcement. The `CouncilSycophancyDetected` threshold returns to **0.85** (max pairwise cosine). Calibration acceptance threshold returns to **≥ 0.40** overall disagreement-rate. See `FIX_PLAN.md §25.4`.
+   - *Defense (restored multi-vendor heterogeneity; §25 SUPERSEDES §24).* Two orthogonal diversity axes: **vendor heterogeneity** — 4 frontier models from 4 distinct vendors (`openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1-pro-preview`, `x-ai/grok-4.3`) routed via OpenRouter — **plus** **persona heterogeneity** (Visionary / Pessimist / Pragmatist) **+** anonymized cross-review **+** dissent-preserving chairman. Vendor heterogeneity is the primary defense; persona heterogeneity is orthogonal reinforcement. The `CouncilSycophancyDetected` threshold returns to **0.85** (max pairwise cosine). Calibration acceptance threshold returns to **≥ 0.40** overall disagreement-rate. See `FIX_PLAN.md §25.4`.
 2. **Numerical gullibility.** LLMs evaluate formulas linguistically (elegant, novel, well-cited) rather than numerically (NaN-stable, gradient-bounded). A council can unanimously approve a formula none of the models can actually simulate in head.
    - *Defense:* G2.5 tractability dry-run **+** G3 surrogate **+** G4 portfolio. Councils never approve a formula that has not been numerically executed.
 3. **Invariant hacking.** Code-gen learns to satisfy the *named* invariants ($\nabla\!\cdot\!\mathbf{B}=0$, energy conservation) without solving the actual problem.
@@ -377,6 +379,8 @@ The factory must explicitly defend against each of the following. These are not 
 - Autonomous Catalog onboarding from upstream documentation.
 - Cross-domain hypothesis generation (e.g., methodology transferred from MD into plasma).
 - C5 budget over $1k/hypothesis becomes routine; aggregate $-cap enforced.
+
+**LLM substrate.** Spec 018 (`specs/018-openrouter-client.md`) is the **LLM substrate** of the factory — every LLM call routes through `OpenRouterClient`, the concrete `DecisionClient` Protocol implementation backed by the `openai` SDK against `https://openrouter.ai/api/v1`. This satisfies the single-env-var invariant in `FIX_PLAN.md §25` (only `OPENROUTER_API_KEY`). Consumers (specs 001, 007, 008, 010, 011, 016) import `from factory.llm_client import OpenRouterClient`; tests use the drop-in `FileClient` fixture-replay mock. See `FIX_PLAN.md §27.2`.
 
 ---
 

@@ -1,0 +1,66 @@
+# __init__.py — Public interface of factory/llm_client/
+#
+# Exposes all client wrapper interfaces, protocols, and exceptions.
+
+from factory.llm_client.api import (
+    DecisionClient,
+    FileClient,
+    LLMClientError,
+    OpenRouterAuthError,
+    OpenRouterClient,
+    OpenRouterConnectError,
+    OpenRouterError,
+    OpenRouterMessage,
+    OpenRouterModelUnavailable,
+    OpenRouterRateLimitError,
+    OpenRouterResponse,
+    OpenRouterResponseFormat,
+    RateLimitedDecisionClient,
+    TransientAPIError,
+)
+from factory.llm_client.limiter import TokenBucket, get_process_token_bucket
+from factory.llm_client.pricing import (
+    ModelPricing,
+    PricingConfigError,
+    PricingDocument,
+    calculate_model_cost,
+    fetch_openrouter_pricing,
+    load_pricing_document,
+    load_pricing_table,
+    parse_openrouter_models_payload,
+    require_model_pricing,
+    update_openrouter_pricing,
+    update_pricing_config,
+    write_pricing_document,
+)
+
+__all__ = [
+    "DecisionClient",
+    "FileClient",
+    "LLMClientError",
+    "ModelPricing",
+    "OpenRouterAuthError",
+    "OpenRouterClient",
+    "OpenRouterConnectError",
+    "OpenRouterError",
+    "OpenRouterMessage",
+    "OpenRouterModelUnavailable",
+    "OpenRouterRateLimitError",
+    "OpenRouterResponse",
+    "OpenRouterResponseFormat",
+    "PricingConfigError",
+    "PricingDocument",
+    "RateLimitedDecisionClient",
+    "TokenBucket",
+    "TransientAPIError",
+    "calculate_model_cost",
+    "fetch_openrouter_pricing",
+    "get_process_token_bucket",
+    "load_pricing_document",
+    "load_pricing_table",
+    "parse_openrouter_models_payload",
+    "require_model_pricing",
+    "update_openrouter_pricing",
+    "update_pricing_config",
+    "write_pricing_document",
+]

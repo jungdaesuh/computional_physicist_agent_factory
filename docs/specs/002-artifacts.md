@@ -147,10 +147,14 @@ class _ArtifactBase(BaseModel):
         """Parse + validate; raises ArtifactValidationError on failure."""
 
     def to_canonical_json(self) -> bytes:
-        """Deterministic JSON serialization for hashing (sorted keys, no whitespace, allow_nan=False)."""
+        """Deterministic JSON serialization for hashing.
+
+        Excludes provenance_hash and created_at, sorts keys, strips whitespace,
+        and rejects NaN/Infinity.
+        """
 
     def compute_hash(self) -> ArtifactHash:
-        """SHA-256 of canonical JSON with provenance_hash field excluded."""
+        """SHA-256 of canonical JSON excluding provenance_hash and created_at."""
 
     def verify_self(self) -> None:
         """Raise ArtifactProvenanceMismatch if compute_hash() != self.provenance_hash."""
@@ -551,11 +555,11 @@ The thirteen artifacts and their producer / consumer map (mirrors FIX_PLAN §1 +
 ```python
 def compute_hash(artifact: _ArtifactBase) -> ArtifactHash:
     # 1. Serialize to canonical JSON: sorted keys, no whitespace, UTF-8.
-    # 2. Exclude provenance_hash field from the serialization.
+    # 2. Exclude provenance_hash and created_at fields from the serialization.
     # 3. allow_nan=False: NaN and Infinity raise ArtifactSerializationError at serialize-time,
     #    surfacing upstream physics bugs instead of producing an unparseable artifact.
     # 4. SHA-256 over the resulting bytes.
-    payload = artifact.model_dump(exclude={"provenance_hash"}, mode="json")
+    payload = artifact.model_dump(exclude={"provenance_hash", "created_at"}, mode="json")
     canonical = json.dumps(
         payload,
         sort_keys=True,

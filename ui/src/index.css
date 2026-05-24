@@ -1,0 +1,671 @@
+/*
+ * AI Co-Computational Physicist Factory - Global Dark-Mode Design System
+ * File: ui/src/index.css
+ *
+ * Description:
+ * This stylesheet implements the typography, color palette, surface elevations,
+ * status controls, dense tables, copyable code blocks, custom scrollbars, and
+ * interaction layouts for the operations console of the StellaEvolve research factory.
+ *
+ * Design Principles:
+ * - High density, keyboard-driven UI (similar to Linear, Sentry, or Datadog).
+ * - Max 4px corner radius for standard containers; strict 2px radius for status pills.
+ * - No soft pastel gradients, drop shadows, or rounded pill buttons.
+ * - 1px solid borders and explicit background elevations are used to structure elements.
+ * - JetBrains Mono for numbers, equations, hashes, and code blocks.
+ * - Inter for interface text and sans-serif elements.
+ *
+ * Usage Cases:
+ * 1. Global Reset & Theme Application: Set root CSS variables and apply to the body element.
+ * 2. Layout Elevation Levels: Use surface utility classes (.surface-1, .surface-2, .surface-3) with borders.
+ * 3. Status Pills: Apply strict status pill rules (.status-pill) with state suffixes (.pass, .fail, .pending, .in-progress, .dissent, .parked).
+ * 4. Code Blocks: Format copyable code blocks (.code-block) with optional headers and action overlays.
+ * 5. Dense Tables: Build heavy data views (.dense-table) with sticky headers and scroll boundaries.
+ * 6. Typography & Numbers: Toggle monospace tabular alignments (.font-mono, .font-sans).
+ * 7. custom Scrollbars: Customize scroll containers (.custom-scrollbar) to avoid browser defaults.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* ==========================================================================
+   1. CSS VARIABLES (DESIGN TOKENS)
+   ========================================================================== */
+:root {
+  /* Color Palette */
+  --bg-main: #0A0A0B;
+  --bg-surface-1: #111114; /* Lowest elevation surface */
+  --bg-surface-2: #161619; /* Mid-level elevation surface */
+  --bg-surface-3: #1C1C20; /* Highest elevation surface */
+
+  /* Text Opacities */
+  --text-primary: #EDEDED;
+  --text-secondary: rgba(237, 237, 237, 0.6); /* 60% Opacity */
+  --text-tertiary: rgba(237, 237, 237, 0.4);  /* 40% Opacity */
+
+  /* Muted Electric Cyan Accent */
+  --accent-cyan: #4EC9D6;
+  --accent-cyan-dim: rgba(78, 201, 214, 0.1);
+  --accent-cyan-hover: #68d5e1;
+
+  /* Status Colors */
+  --status-pass: #3DDC97;
+  --status-pass-bg: rgba(61, 220, 151, 0.08);
+  --status-pass-border: rgba(61, 220, 151, 0.25);
+
+  --status-fail: #FF5C5C;
+  --status-fail-bg: rgba(255, 92, 92, 0.08);
+  --status-fail-border: rgba(255, 92, 92, 0.25);
+
+  --status-pending: #FFB84D;
+  --status-pending-bg: rgba(255, 184, 77, 0.08);
+  --status-pending-border: rgba(255, 184, 77, 0.25);
+
+  --status-in-progress: #5B9BD5;
+  --status-in-progress-bg: rgba(91, 155, 213, 0.08);
+  --status-in-progress-border: rgba(91, 155, 213, 0.25);
+
+  --status-dissent: #A78BFA;
+  --status-dissent-bg: rgba(167, 139, 250, 0.08);
+  --status-dissent-border: rgba(167, 139, 250, 0.25);
+
+  --status-parked: #A78BFA;
+  --status-parked-bg: rgba(167, 139, 250, 0.08);
+  --status-parked-border: rgba(167, 139, 250, 0.25);
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Font Scaling System */
+  --font-size-xs: 12px;
+  --font-size-sm: 13px; /* Default body */
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 28px;
+
+  /* Borders & Spacing */
+  --border-color: #222226;
+  --border-color-hover: #2D2D34;
+  --border-radius-pill: 2px;  /* Strict status pills */
+  --border-radius-card: 4px;  /* Strict container radius limit */
+  --border-radius-btn: 4px;   /* Button max radius */
+}
+
+/* ==========================================================================
+   2. GLOBAL RESET & BASE STYLES
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+h1 { font-size: var(--font-size-2xl); }
+h2 { font-size: var(--font-size-xl); }
+h3 { font-size: var(--font-size-lg); }
+h4 { font-size: var(--font-size-md); }
+
+p {
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  color: var(--accent-cyan-hover);
+}
+
+code, pre, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: inherit;
+}
+
+input, button, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+/* ==========================================================================
+   3. STRUCTURAL ELEVATIONS & SURFACES
+   ========================================================================== */
+.surface-1 {
+  background-color: var(--bg-surface-1);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-card);
+}
+
+.surface-2 {
+  background-color: var(--bg-surface-2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-card);
+}
+
+.surface-3 {
+  background-color: var(--bg-surface-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-card);
+}
+
+/* No Drop Shadows Allowed. Hover styles rely on border coloring. */
+.hover-elevate {
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.hover-elevate:hover {
+  border-color: var(--border-color-hover);
+  background-color: rgba(255, 255, 255, 0.015);
+}
+
+/* ==========================================================================
+   4. TYPOGRAPHY & LAYOUT UTILITIES
+   ========================================================================== */
+.font-sans { font-family: var(--font-sans); }
+.font-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-md { font-size: var(--font-size-md); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+
+.text-cyan { color: var(--accent-cyan); }
+.text-pass { color: var(--status-pass); }
+.text-fail { color: var(--status-fail); }
+.text-pending { color: var(--status-pending); }
+.text-in-progress { color: var(--status-in-progress); }
+.text-dissent { color: var(--status-dissent); }
+
+/* Provenance Hash Chip */
+.hash-chip {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  background-color: var(--bg-surface-3);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  padding: 1px 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: border-color 0.15s ease, color 0.15s ease;
+  user-select: all;
+}
+.hash-chip:hover {
+  border-color: var(--accent-cyan);
+  color: var(--text-primary);
+}
+
+/* ==========================================================================
+   5. COMPONENT: STRICT 2PX CORNER STATUS PILLS
+   ========================================================================== */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--font-size-xs);
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: var(--border-radius-pill); /* Strict 2px corner radius */
+  border: 1px solid transparent;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.status-pill.pass {
+  background-color: var(--status-pass-bg);
+  border-color: var(--status-pass-border);
+  color: var(--status-pass);
+}
+
+.status-pill.fail {
+  background-color: var(--status-fail-bg);
+  border-color: var(--status-fail-border);
+  color: var(--status-fail);
+}
+
+.status-pill.pending {
+  background-color: var(--status-pending-bg);
+  border-color: var(--status-pending-border);
+  color: var(--status-pending);
+}
+
+.status-pill.in-progress {
+  background-color: var(--status-in-progress-bg);
+  border-color: var(--status-in-progress-border);
+  color: var(--status-in-progress);
+}
+
+.status-pill.dissent {
+  background-color: var(--status-dissent-bg);
+  border-color: var(--status-dissent-border);
+  color: var(--status-dissent);
+}
+
+.status-pill.parked {
+  background-color: var(--status-parked-bg);
+  border-color: var(--status-parked-border);
+  color: var(--status-parked);
+}
+
+/* ==========================================================================
+   6. COMPONENT: COPYABLE CODE BLOCKS
+   ========================================================================== */
+.code-block {
+  font-family: var(--font-mono);
+  background-color: var(--bg-surface-1);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-card);
+  position: relative;
+  overflow: hidden;
+  margin: 12px 0;
+}
+
+.code-block-header {
+  background-color: var(--bg-surface-2);
+  border-bottom: 1px solid var(--border-color);
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.code-block-title {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.code-block-copy-btn {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-btn);
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.code-block-copy-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-cyan);
+}
+
+.code-block pre {
+  padding: 12px;
+  margin: 0;
+  overflow-x: auto;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   7. COMPONENT: DENSE TABLES WITH STICKY HEADERS
+   ========================================================================== */
+.dense-table-wrapper {
+  overflow: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-card);
+  background-color: var(--bg-surface-1);
+  position: relative;
+}
+
+.dense-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--font-size-xs);
+}
+
+.dense-table th {
+  background-color: var(--bg-surface-2);
+  color: var(--text-secondary);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-color);
+  padding: 8px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.dense-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.dense-table tr:last-child td {
+  border-bottom: none;
+}
+
+.dense-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.dense-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.015);
+}
+
+/* ==========================================================================
+   8. INTERACTIVE INPUTS, BUTTONS & SEGMENTED CONTROLS
+   ========================================================================== */
+/* Strict max 4px radius buttons. No soft gradients, flat surface aesthetics. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  padding: 6px 12px;
+  border-radius: var(--border-radius-btn);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.btn-primary {
+  background-color: var(--accent-cyan-dim);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+.btn-primary:hover {
+  background-color: var(--accent-cyan);
+  color: var(--bg-main);
+  border-color: var(--accent-cyan-hover);
+}
+
+.btn-secondary {
+  background-color: var(--bg-surface-2);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+.btn-secondary:hover {
+  border-color: var(--border-color-hover);
+  background-color: var(--bg-surface-3);
+}
+
+.btn-danger {
+  background-color: rgba(255, 92, 92, 0.08);
+  border-color: var(--status-fail);
+  color: var(--status-fail);
+}
+.btn-danger:hover {
+  background-color: var(--status-fail);
+  color: var(--bg-main);
+  border-color: var(--status-fail);
+}
+
+/* Segmented Controls (max 4 options, keyboard or click friendly) */
+.segmented-control {
+  display: inline-flex;
+  background-color: var(--bg-surface-1);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-btn);
+  padding: 2px;
+}
+
+.segmented-option {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  padding: 4px 8px;
+  border-radius: var(--border-radius-pill);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.segmented-option:hover {
+  color: var(--text-primary);
+}
+.segmented-option.active {
+  background-color: var(--bg-surface-3);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+/* Form Controls */
+.form-input {
+  background-color: var(--bg-surface-1);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-btn);
+  padding: 6px 10px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+.form-input:focus {
+  border-color: var(--accent-cyan);
+}
+.form-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* ==========================================================================
+   9. CUSTOM SCROLLBARS
+   ========================================================================== */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--bg-surface-3);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--border-color-hover);
+}
+
+/* Firefox scrollbar compatibility */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-surface-3) var(--bg-main);
+}
+
+/* ==========================================================================
+   10. LAYOUT & SPECIALIST COMPONENTS
+   ========================================================================== */
+/* Header Strip */
+.header-strip {
+  background-color: var(--bg-surface-1);
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Council Verdict Panel: Two columns, equal weight */
+.council-verdict-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.verdict-majority {
+  border-right: 1px solid var(--border-color);
+  padding-right: 16px;
+}
+
+.verdict-dissents {
+  padding-left: 16px;
+}
+
+.dissent-card {
+  background-color: var(--status-dissent-bg);
+  border: 1px solid var(--status-dissent-border);
+  border-left: 4px solid var(--status-dissent); /* Violet left-edge accent */
+  border-radius: var(--border-radius-card);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+/* Fidelity Ladder Tier Cards */
+.fidelity-ladder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fidelity-tier {
+  background-color: var(--bg-surface-1);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-card);
+  padding: 10px 14px;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+  opacity: 0.65;
+}
+
+.fidelity-tier.active {
+  border-color: var(--accent-cyan);
+  background-color: var(--bg-surface-2);
+  opacity: 1.0;
+}
+
+.fidelity-tier.completed {
+  opacity: 0.85;
+}
+
+/* Equation Render Frame */
+.equation-frame {
+  font-family: var(--font-mono);
+  text-align: center;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-card);
+  margin: 12px 0;
+}
+
+/* Timeline Components */
+.timeline {
+  position: relative;
+  padding-left: 20px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: var(--border-color);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -20px;
+  top: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: var(--bg-surface-3);
+  border: 1px solid var(--border-color);
+}
+
+.timeline-item.active .timeline-marker {
+  background-color: var(--accent-cyan);
+  border-color: var(--accent-cyan-hover);
+}
+
+.timeline-item.passed .timeline-marker {
+  background-color: var(--status-pass);
+  border-color: var(--status-pass-border);
+}
+
+.timeline-item.failed .timeline-marker {
+  background-color: var(--status-fail);
+  border-color: var(--status-fail-border);
+}
+
+/* Empty States */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius-card);
+  background-color: rgba(255, 255, 255, 0.005);
+}
+
+.empty-state-text {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+/* Sparklines */
+.sparkline-container {
+  height: 40px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.sparkline-bar {
+  flex: 1;
+  background-color: var(--border-color-hover);
+  transition: background-color 0.15s ease;
+}
+
+.sparkline-bar:hover {
+  background-color: var(--accent-cyan);
+}

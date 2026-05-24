@@ -25,13 +25,13 @@ This runbook is load-bearing. If a step does not produce the documented signal, 
 - A single LLM API key exported in the shell that will launch the factory:
   - `OPENROUTER_API_KEY` — OpenRouter API key used by both the council (4 frontier vendors) and every agentic LLM call (Gemini Flash). See FIX_PLAN §25 (which **SUPERSEDES §24**).
 - The legacy keys `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `XAI_API_KEY`, and `GEMINI_FLASH` are **no longer required** and must not be set as a fallback path. All LLM access flows through OpenRouter under one env var.
-- `OPENALEX_MAILTO` set to a contact email per the OpenAlex usage policy (literature discovery dependency). Optional but recommended: `OPENALEX_API_KEY` for higher rate limits.
+- `OPENALEX_API_KEY` set for live OpenAlex literature discovery. `OPENALEX_MAILTO` is obsolete for OpenAlex rate-limit behavior and is not required.
 - Never commit keys. Store `OPENROUTER_API_KEY` in `.envrc.local` (gitignored) or your system keychain. The factory reads it at startup only; rotation requires a restart.
 
 ### 1.3 Configuration that must be in place
 
 - `config/operator.yaml` (operator interface defaults) present and parseable. Verify with `factory --mock-mode status`.
-- `config/council/lineup.yaml` lineup file carrying a `CouncilLineup` with `models: list[ModelSpec]` (4 entries, one per vendor in FIX_PLAN §25.3 — `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1`, `x-ai/grok-4.3`) plus a `persona_assignment` mapping each model id to a persona (`Visionary | Pessimist | Pragmatist`) and a `chairman_policy` (`random | round_robin | weighted_by_cost`). Each `ModelSpec` records `openrouter_id`, `vendor`, `timeout_s`, `max_tokens` per FIX_PLAN §25.4. The default `Council.mock_lineup()` is **not** acceptable for live cycles.
+- `config/council/lineup.yaml` lineup file carrying a `CouncilLineup` with `models: list[ModelSpec]` (4 entries, one per vendor in FIX_PLAN §25.3 — `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1-pro-preview`, `x-ai/grok-4.3`) plus a `persona_assignment` mapping each model id to a persona (`Visionary | Pessimist | Pragmatist`) and a `chairman_policy` (`random | round_robin | weighted_by_cost`). Each `ModelSpec` records `openrouter_id`, `vendor`, `timeout_s`, `max_tokens` per FIX_PLAN §25.4. The default `Council.mock_lineup()` is **not** acceptable for live cycles.
 - `config/pricing/openrouter.yaml` populated with current OpenRouter passthrough USD-per-1M input/output prices for all 5 model IDs (FIX_PLAN §25.6). The Council library reads this once at startup; missing or stale pricing causes `BudgetTokenUsageMissing` semantics to misreport cost.
 - `config/budget.yaml` with `per_hypothesis_usd`, `daily_usd`, and `aggregate_usd` set. For the first cycle pin `per_hypothesis_usd: 50` to match the PRD-001 cost ceiling per FIX_PLAN §25.8 (typical cycle ≤ $5; the $50 cap is the hard ceiling, not the expected spend).
 - `config/domain_scope.yaml` listing `allowed_domains[]` and `allowed_simulator_ids[]`. Out-of-scope hypotheses park at G0 silently if this file is empty; do not skip it.
@@ -101,6 +101,16 @@ jq '{flagged_sycophancy, overall_disagreement_rate, n_probes: (.probe_results | 
 Expected: `flagged_sycophancy: false`, `overall_disagreement_rate >= 0.40`, `n_probes >= 10`. Anything else means the council lineup is currently sycophantic and you must run `docs/runbooks/council-calibration.md` to repair it before continuing. The threshold is restored to 0.40 under the 4-vendor OpenRouter lineup (FIX_PLAN §25.4 **SUPERSEDES §24**'s lowered 0.25 floor); empirical floor 0.30 triggers re-calibration; below 0.30 fails.
 
 Pin the calibration JSON in your run journal; the PRD-003 postmortem must reference the exact lineup hash used for the first cycle.
+
+### Step 4.5 -- Certify the live council production path
+
+```bash
+uv run python -m factory.council certify-live --cost-cap-usd 0.50
+```
+
+Expected output: one JSON object with `status: "passed"`, `lineup_vendor_count: 4`, `session.stage1_response_count: 4`, `session.stage2_response_count: 4`, `cost_within_cap: true`, `budget.budget_entry_count >= 9`, and `error_path.exception: "OpenRouterModelUnavailable"`. The command also writes `runs/live_council_certifications/<timestamp>/certification.json`.
+
+If this fails, do not start the first autonomous cycle. Follow `docs/runbooks/openrouter-client.md` to distinguish key failure, model catalog drift, rate limiting, pricing drift, and a true council integration bug.
 
 ### Step 5 -- Configure `DomainScope` and `Budget`
 

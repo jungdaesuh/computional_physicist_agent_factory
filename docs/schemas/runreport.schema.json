@@ -1,0 +1,107 @@
+{
+  "additionalProperties": false,
+  "description": "The publishable LaTeX/PDF document with BibTeX bibliography.",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    },
+    "hypothesis_id": {
+      "title": "Hypothesis Id",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "abstract": {
+      "title": "Abstract",
+      "type": "string"
+    },
+    "latex_source": {
+      "title": "Latex Source",
+      "type": "string"
+    },
+    "figure_paths": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Figure Paths",
+      "type": "array"
+    },
+    "bibtex": {
+      "title": "Bibtex",
+      "type": "string"
+    },
+    "embedded_council_verdict_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Embedded Council Verdict Hashes",
+      "type": "array"
+    },
+    "g6_approved": {
+      "title": "G6 Approved",
+      "type": "boolean"
+    },
+    "g6_approver": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "G6 Approver"
+    },
+    "g6_approved_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "G6 Approved At"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash",
+    "hypothesis_id",
+    "title",
+    "abstract",
+    "latex_source",
+    "figure_paths",
+    "bibtex",
+    "embedded_council_verdict_hashes",
+    "g6_approved",
+    "g6_approver",
+    "g6_approved_at"
+  ],
+  "title": "RunReport",
+  "type": "object"
+}

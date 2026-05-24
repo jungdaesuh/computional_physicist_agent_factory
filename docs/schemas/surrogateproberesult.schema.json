@@ -1,0 +1,132 @@
+{
+  "$defs": {
+    "UncertaintyBlock": {
+      "additionalProperties": false,
+      "description": "Typed block representing statistical error estimates.",
+      "properties": {
+        "metric_name": {
+          "title": "Metric Name",
+          "type": "string"
+        },
+        "point_estimate": {
+          "title": "Point Estimate",
+          "type": "number"
+        },
+        "ci_lower": {
+          "title": "Ci Lower",
+          "type": "number"
+        },
+        "ci_upper": {
+          "title": "Ci Upper",
+          "type": "number"
+        },
+        "ci_method": {
+          "enum": [
+            "t_interval",
+            "bootstrap",
+            "bca"
+          ],
+          "title": "Ci Method",
+          "type": "string"
+        },
+        "n_seeds": {
+          "title": "N Seeds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "metric_name",
+        "point_estimate",
+        "ci_lower",
+        "ci_upper",
+        "ci_method",
+        "n_seeds"
+      ],
+      "title": "UncertaintyBlock",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Result of running a candidate against a cheap surrogate model (G3).",
+  "properties": {
+    "artifact_type": {
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "provenance_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Provenance Hash",
+      "type": "string"
+    },
+    "parent_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Parent Hashes",
+      "type": "array"
+    },
+    "hypothesis_id": {
+      "title": "Hypothesis Id",
+      "type": "string"
+    },
+    "experiment_spec_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Experiment Spec Hash",
+      "type": "string"
+    },
+    "predicted_value": {
+      "title": "Predicted Value",
+      "type": "number"
+    },
+    "uncertainty": {
+      "$ref": "#/$defs/UncertaintyBlock"
+    },
+    "ood_flag": {
+      "title": "Ood Flag",
+      "type": "boolean"
+    },
+    "ood_distance_percentile": {
+      "title": "Ood Distance Percentile",
+      "type": "number"
+    },
+    "pass_vs_baseline": {
+      "enum": [
+        "pass",
+        "fail",
+        "escalate"
+      ],
+      "title": "Pass Vs Baseline",
+      "type": "string"
+    },
+    "surrogate_model_id": {
+      "title": "Surrogate Model Id",
+      "type": "string"
+    },
+    "feature_vector_hash": {
+      "title": "Feature Vector Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "artifact_type",
+    "created_at",
+    "provenance_hash",
+    "hypothesis_id",
+    "experiment_spec_hash",
+    "predicted_value",
+    "uncertainty",
+    "ood_flag",
+    "ood_distance_percentile",
+    "pass_vs_baseline",
+    "surrogate_model_id",
+    "feature_vector_hash"
+  ],
+  "title": "SurrogateProbeResult",
+  "type": "object"
+}

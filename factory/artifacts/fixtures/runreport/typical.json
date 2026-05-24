@@ -1,0 +1,22 @@
+{
+  "artifact_type": "RunReport",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "d14a27ec01b923862cf65ab861cacfdb2173ef71f2a99521df7e0b476a006508",
+  "parent_hashes": [
+    "65c1265426bb009fafe1941120a422eae1426af117459c8a452eb0a5119df80a"
+  ],
+  "hypothesis_id": "HYP-001",
+  "title": "MHD Force Balance Optimization with DESC",
+  "abstract": "This paper reports the results of our autonomous optimization.",
+  "latex_source": "\\documentclass{article}\\begin{document}Hello\\end{document}",
+  "figure_paths": [
+    "runs/HYP-001/figures/fig1.png"
+  ],
+  "bibtex": "@article{foo, author={Smith}, title={Title}, year={2024}}",
+  "embedded_council_verdict_hashes": [
+    "5d9cbafea527018460ff193dbe5d6e6d02d3a6b962a474a78b070eed1d361536"
+  ],
+  "g6_approved": true,
+  "g6_approver": "Operator1",
+  "g6_approved_at": "2026-05-23T15:00:00Z"
+}

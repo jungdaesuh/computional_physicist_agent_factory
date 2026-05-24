@@ -1,0 +1,22 @@
+{
+  "artifact_type": "Budget",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "a8796c3874964992bcf9902fac8e72fcf76dbfefef3c704517f929ed7e8946e6",
+  "parent_hashes": [
+    "ada26da85bd38c7fbdebfb8345437b86b463c9a4af9b2c8e6ae147fdb1b2d91a"
+  ],
+  "hypothesis_id": "HYP-001",
+  "dollar_cap": 50.0,
+  "wall_clock_cap_seconds": 3600.0,
+  "token_cap": 5000000,
+  "iteration_cap": 25,
+  "running_ledger": [
+    {
+      "ts": "2026-05-23T12:05:00Z",
+      "module": "council",
+      "cost_usd": 0.15,
+      "tokens": 20000,
+      "description": "C1 Worthiness"
+    }
+  ]
+}

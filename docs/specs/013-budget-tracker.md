@@ -4,7 +4,7 @@
 
 ## CONTEXT (60-second summary — read first)
 - The **Budget Tracker** is the factory's cost governor. **Three** tiers of caps are enforced: per-`HypothesisSpec`, per-day (rolling UTC window), and per-program aggregate (hard kill switch). There is **no `per_cycle` tier** — in Phase A one cycle equals one hypothesis traversal.
-- The 5 facts: (1) every cost-incurring operation calls `tracker.record(...)` *after* the operation completes — never estimate-and-commit; (2) per-hypothesis caps are checked *before* expensive operations (G3 surrogate, G4 oracle, council deliberation) via `tracker.check_and_deduct(...)`; (3) aggregate program cap defaults to $1000 and is a hard halt — operator paged, sentinel written to `runs/_control/HALT_AGGREGATE_CAP`, no silent bypass; (4) daily caps reset at UTC midnight; (5) `BudgetExhausted` is routed by spec 003 state machine to the `intractable` terminal.
+- The 5 facts: (1) every cost-incurring operation calls `tracker.record(...)` *after* the operation completes — never estimate-and-commit; (2) per-hypothesis caps are checked *before* expensive operations (G3 surrogate, G4 oracle, council deliberation) via `tracker.check_and_deduct(...)`; (3) aggregate program cap defaults to $500 for Phase B and is a hard halt — operator paged, sentinel written to `runs/_control/HALT_AGGREGATE_CAP`, no silent bypass; (4) daily caps reset at UTC midnight; (5) `BudgetExhausted` is routed by spec 003 state machine to the `intractable` terminal.
 - Open first: `factory/budget/api.py` and the typical-usage test.
 
 ## ENTRY POINTS
@@ -46,7 +46,7 @@ The Budget Tracker is the **only** authority on whether the factory may spend mo
 - JSON persistence: `runs/_budget/state.json` snapshot (debounced) + `runs/_budget/ledger.jsonl` append-only (every entry).
 - Proactive `check_and_deduct(...)` for G3 surrogate calls, G4 oracle calls, council deliberations, container builds.
 - Per-day rolling window with reset at UTC 00:00.
-- Aggregate program kill switch (default $1000, configurable in `config/budget.yaml`); halt sentinel at `runs/_control/HALT_AGGREGATE_CAP`.
+- Aggregate program kill switch (default $500 for Phase B, configurable in `config/budget.yaml`); halt sentinel at `runs/_control/HALT_AGGREGATE_CAP`.
 - Cost attribution by module for telemetry (Settings panel cost-per-component bar).
 - Per-module CLI subcommands: `show`, `breakdown`, `set-cap`, `reset-day`, `simulate`, `clear-halt`.
 - Mock mode + fixtures for offline tests.
@@ -240,14 +240,14 @@ class Reservation:
 
 ```yaml
 program:
-  aggregate_dollar_cap: 1000.00
+  aggregate_dollar_cap: 500.00
   aggregate_kill_switch_enabled: true
 day:
   dollars: 100.00
   tokens: 10_000_000
   wall_clock_seconds: 86_400
 default_hypothesis:
-  dollars: 50.00          # matches PRD-001 §4 per-hypothesis acceptance ceiling
+  dollars: 100.00         # Phase B per-hypothesis cap
   tokens: 2_000_000
   wall_clock_seconds: 7_200
   iterations: 10
@@ -259,7 +259,7 @@ reservation:
   ttl_seconds: 300
 ```
 
-The `default_hypothesis.dollars` of **$50** is the Phase A acceptance ceiling defined in PRD-001 §4. Operators may lower the per-hypothesis cap locally via `factory budget set --per-hypothesis-usd <usd>`; they may not silently raise it above the aggregate cap.
+The `default_hypothesis.dollars` of **$100** is the Phase B overnight-run envelope from the Phase B implementation plan. Operators may lower the per-hypothesis cap locally via `factory budget set --per-hypothesis-usd <usd>`; they may not silently raise it above the aggregate cap.
 
 ### 4.2 Pricing table (`config/pricing/openrouter.yaml`)
 
@@ -287,7 +287,7 @@ models:
   "anthropic/claude-opus-4.7":
     input_per_1m_tokens_usd: <fill>
     output_per_1m_tokens_usd: <fill>
-  "google/gemini-3.1":
+  "google/gemini-3.1-pro-preview":
     input_per_1m_tokens_usd: <fill>
     output_per_1m_tokens_usd: <fill>
   "x-ai/grok-4.3":
@@ -330,7 +330,7 @@ Phase A uses two files; no SQLite write is involved.
   "halted": false,
   "halt_reason": null,
   "aggregate": {
-    "cap": {"dollars": 1000.00, "tokens": 0, "wall_clock_seconds": 0},
+    "cap": {"dollars": 500.00, "tokens": 0, "wall_clock_seconds": 0},
     "used": {"dollars": 312.41, "tokens": 0, "wall_clock_seconds": 0}
   },
   "day": {
@@ -340,7 +340,7 @@ Phase A uses two files; no SQLite write is involved.
   },
   "hypotheses": {
     "H-001": {
-      "cap":  {"dollars": 50.00, "tokens": 2000000, "wall_clock_seconds": 7200, "iterations": 10},
+      "cap":  {"dollars": 100.00, "tokens": 2000000, "wall_clock_seconds": 7200, "iterations": 10},
       "used": {"dollars": 12.30, "tokens": 410000, "wall_clock_seconds": 1820, "iterations": 3}
     }
   }
@@ -455,7 +455,7 @@ The factory state machine (spec 003) runs cycles serially in Phase A, but counci
 - `test_breakdown_by_module.py` — record entries from multiple modules; verify breakdown sums correctly.
 - `test_ledger_corruption.py` — tamper with a ledger row; verify `BudgetLedgerCorrupted` on load.
 - `test_json_persistence_roundtrip.py` — write entries, restart tracker, verify totals reconstructed from `state.json` + `ledger.jsonl` (no SQLite path involved).
-- `test_per_hypothesis_default_is_50.py` — assert the default `HypothesisCaps.dollars` loaded from `config/budget.yaml` is $50.00 per PRD-001 §4.
+- `test_phase_b_budget_defaults.py` — assert the default aggregate cap is $500 and `HypothesisCaps.dollars` loaded from `config/budget.yaml` is $100.00 for Phase B.
 
 **Live-mode tests** (`@pytest.mark.live`, gated):
 - `test_live_council_cost_attribution.py` — single live council deliberation; verify cost recorded matches vendor invoice estimate within 10%.
@@ -492,7 +492,7 @@ The factory state machine (spec 003) runs cycles serially in Phase A, but counci
 - [ ] Implement `breakdown_by_module` with in-memory + on-disk merge over JSON ledger.
 - [ ] Implement reservation lifecycle (commit / cancel / TTL expire).
 - [ ] Implement ledger checksum on write + verify on load.
-- [ ] Author `config/budget.yaml` with `default_hypothesis.dollars = 50.00` and documented defaults.
+- [ ] Author `config/budget.yaml` with Phase B `program.aggregate_dollar_cap = 500.00`, `default_hypothesis.dollars = 100.00`, and documented defaults.
 - [ ] Document the single `config/pricing/openrouter.yaml` schema (FIX_PLAN §25.6) — 5-model dict covering the 4 council vendors + `google/gemini-3.5-flash`; the Council library (spec 001) is the consumer.
 - [ ] Build mock mode (`BudgetTracker.mock_caps`, `MockCostProvider`).
 - [ ] Write `factory/budget/cli.py` with `show`, `breakdown`, `set-cap`, `reset-day`, `simulate`, `clear-halt` subcommands; ensure `factory budget set` (spec 015) and `python -m factory.budget set-cap` both call `BudgetTracker.set_cap`.

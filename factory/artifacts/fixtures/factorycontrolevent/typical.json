@@ -1,0 +1,11 @@
+{
+  "artifact_type": "FactoryControlEvent",
+  "created_at": "2026-05-23T12:00:00Z",
+  "provenance_hash": "8718c9934ee91bb02e05208ed8aace8f9cdc1c8d06acdaba718fbebfbde59053",
+  "parent_hashes": [],
+  "event_type": "pause",
+  "target_id": "HYP-001",
+  "reason": "Operator manually paused the run.",
+  "operator": "admin",
+  "invoked_at": "2026-05-23T12:10:00Z"
+}

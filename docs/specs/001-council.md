@@ -47,7 +47,7 @@ It is shipped as a standalone library first (PRD-002) so we can prove the sycoph
 - **Multi-vendor council lineup invariant:** 4 `ModelSpec` entries, one per vendor in `{openai, anthropic, google, x-ai}`, mapped to canonical OpenRouter IDs (FIX_PLAN §25.3):
   - `openai/gpt-5.5`
   - `anthropic/claude-opus-4.7`
-  - `google/gemini-3.1`
+  - `google/gemini-3.1-pro-preview`
   - `x-ai/grok-4.3`
 - **OpenRouter ranking headers on every call:** `HTTP-Referer` (loaded from operator config) and `X-OpenRouter-Title: ai-co-computational-physicist`.
 - Persona prompt templates (Visionary, Pessimist, Pragmatist) loaded from `config/council/personas/{visionary,pessimist,pragmatist}.md`.
@@ -95,59 +95,26 @@ class BudgetTokenUsageMissing(CouncilError): ...
 class OpenRouterError(CouncilError): ...    # wraps HTTP 4xx/5xx + rate limits from OpenRouter
 
 
-# --- Hybrid OpenRouter client (per FIX_PLAN §25.2 — verbatim) ---
-
 @dataclass(frozen=True)
-class OpenRouterResponse:
-    text: str
-    model_id_actual: str           # may differ from request if OpenRouter routes
-    input_tokens: int
-    output_tokens: int
+class CouncilContext:
+    """Typed context envelope passed into deliberation prompts.
 
-# Canonical Python invocation pattern (FIX_PLAN §25.2 verbatim).
-# All LLM calls in the library go through this single shape. The same
-# client serves both council (frontier models) and any agentic call in
-# the project (Gemini Flash).
-#
-#     import os
-#     from openai import OpenAI
-#
-#     # Single client, shared by council and all agentic calls.
-#     _CLIENT = OpenAI(
-#         base_url="https://openrouter.ai/api/v1",
-#         api_key=os.environ["OPENROUTER_API_KEY"],
-#     )
-#
-#     _OPENROUTER_RANKING_HEADERS: dict[str, str] = {
-#         "HTTP-Referer": "https://github.com/<org>/<repo>",         # filled from config at startup
-#         "X-OpenRouter-Title": "ai-co-computational-physicist",
-#     }
-#
-#     def call_llm(
-#         model: str,                # canonical IDs in §25.3
-#         system_instruction: str,
-#         user_content: str,
-#         max_tokens: int = 4096,
-#         json_mode: bool = False,
-#     ) -> "OpenRouterResponse":
-#         """Single LLM call. Same client for council and agentic calls. Returns text + usage."""
-#         response = _CLIENT.chat.completions.create(
-#             extra_headers=_OPENROUTER_RANKING_HEADERS,
-#             model=model,
-#             messages=[
-#                 {"role": "system", "content": system_instruction},
-#                 {"role": "user", "content": user_content},
-#             ],
-#             max_tokens=max_tokens,
-#             response_format={"type": "json_object"} if json_mode else None,
-#             # No temperature override by default. Council personas + heterogeneity carry diversity.
-#         )
-#         return OpenRouterResponse(
-#             text=response.choices[0].message.content,
-#             model_id_actual=response.model,                        # may differ from request if OpenRouter routes
-#             input_tokens=response.usage.prompt_tokens,
-#             output_tokens=response.usage.completion_tokens,
-#         )
+    The parent artifact is serialized once as canonical JSON so the council
+    boundary never accepts an untyped mutable mapping.
+    """
+    parent_artifact_type: str
+    parent_artifact_hash: ArtifactHash | None
+    serialized_parent_json: str
+
+
+# --- Hybrid OpenRouter client (per FIX_PLAN §27.2 — shared LLM substrate) ---
+
+from factory.llm_client import OpenRouterClient, OpenRouterResponse
+# Council instantiates a single `OpenRouterClient` once and dispatches per-model
+# via the `model=...` parameter on `OpenRouterClient.invoke(...)`. The client
+# is the concrete `DecisionClient` Protocol implementation defined in
+# `specs/018-openrouter-client.md`; council retains stage / persona / chairman
+# orchestration above it but never owns the SDK / base_url / api_key surface.
 
 
 # --- Council lineup (multi-vendor + persona — FIX_PLAN §25.4) ---
@@ -217,7 +184,7 @@ class Council:
         self,
         council_id: CouncilId,
         question: str,
-        context: dict,                     # serialized parent artifact
+        context: CouncilContext,
         parent_hashes: list[ArtifactHash] = (),
     ) -> CouncilVerdict:
         """Run the three-stage protocol. Returns a CouncilVerdict with preserved
@@ -261,7 +228,7 @@ class Council:
         Returns a 4-vendor lineup matching FIX_PLAN §25.3:
             openai/gpt-5.5         → Pessimist
             anthropic/claude-opus-4.7 → Visionary
-            google/gemini-3.1      → Pessimist
+            google/gemini-3.1-pro-preview      → Pessimist
             x-ai/grok-4.3          → Pragmatist
         with `chairman_policy = "round_robin"`. Persona system_instructions
         are the fixture-mode renderings; no API key is required.
@@ -323,7 +290,7 @@ models:
   "anthropic/claude-opus-4.7":
     input_per_1m_tokens_usd: <fill>
     output_per_1m_tokens_usd: <fill>
-  "google/gemini-3.1":
+  "google/gemini-3.1-pro-preview":
     input_per_1m_tokens_usd: <fill>
     output_per_1m_tokens_usd: <fill>
   "x-ai/grok-4.3":

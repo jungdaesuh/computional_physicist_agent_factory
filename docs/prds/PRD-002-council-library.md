@@ -20,7 +20,7 @@ If the council does not produce useful disagreement on calibration probes, **the
 The "user" for this PRD is the *developer* of downstream components, not the operator. The developer wants to:
 
 1. Install the library and export a **single** API key (`OPENROUTER_API_KEY`) for the OpenRouter-routed OpenAI-compatible SDK (FIX_PLAN §25, which **SUPERSEDES §24**).
-2. Define a council lineup of **4 distinct vendors** routed via OpenRouter — `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1`, `x-ai/grok-4.3` — each assigned a persona (Visionary / Pessimist / Pragmatist) from the configurable persona pool. The vendor lineup is fixed per FIX_PLAN §25.3; persona assignment per vendor is configurable per cycle.
+2. Define a council lineup of **4 distinct vendors** routed via OpenRouter — `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1-pro-preview`, `x-ai/grok-4.3` — each assigned a persona (Visionary / Pessimist / Pragmatist) from the configurable persona pool. The vendor lineup is fixed per FIX_PLAN §25.3; persona assignment per vendor is configurable per cycle.
 3. Call `Council.deliberate(question="Is this gap worth experimenting on?", context=<GapCandidate>, council_id="C1")`.
 4. Receive a `CouncilVerdict` JSON artifact with majority view, preserved dissents, chairman synthesis, persona lineup, and total cost.
 5. Optionally, run `Council.calibrate(probe_set=BUILTIN_DIVISIVE_PROBES)` and receive a sycophancy report calibrated against the multi-vendor disagreement floor.
@@ -48,7 +48,7 @@ A council that **always agrees** on divisive probes fails this PRD and triggers 
 ### In scope (v1)
 
 - Three-stage deliberation: First Opinions → Anonymized Cross-Review → Chairman Synthesis.
-- OpenRouter-routed OpenAI-compatible SDK wrapper: **≥4 calls, one per vendor in §25.3 of FIX_PLAN** (`openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1`, `x-ai/grok-4.3`); persona assignment is configurable but the vendor lineup is fixed. Each call is a fresh `chat.completions.create` invocation — no shared chat history, no shared cache key — so stage 1 opinions remain mutually un-anchored.
+- OpenRouter-routed OpenAI-compatible SDK wrapper: **≥4 calls, one per vendor in §25.3 of FIX_PLAN** (`openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1-pro-preview`, `x-ai/grok-4.3`); persona assignment is configurable but the vendor lineup is fixed. Each call is a fresh `chat.completions.create` invocation — no shared chat history, no shared cache key — so stage 1 opinions remain mutually un-anchored.
 - Persona prompt templates: Visionary, Pessimist (Reviewer 2), Pragmatist — applied as system instructions orthogonally to the vendor axis.
 - `CouncilVerdict` output with `majority_view`, `preserved_dissents[]` (each `DissentEntry` carries its own `rationale` — no separate top-level `dissent_rationales[]` field), `chairman_decision`, `persona_lineup`, `total_cost`, `wall_clock`, `session_id`.
 - Sycophancy calibration: `Council.calibrate(probe_set)` returning disagreement-rate per probe against the restored multi-vendor threshold (overall ≥ 0.40; empirical floor 0.30 triggers re-calibration; < 0.30 triggers redesign).
@@ -72,7 +72,7 @@ A council that **always agrees** on divisive probes fails this PRD and triggers 
 | Persona prompt templates (3 files in `factory/council/personas/`) | `specs/001-council.md` | Markdown templates with placeholders. |
 | OpenRouter-routed OpenAI-compatible SDK wrapper (`factory/council/openrouter_client.py`) | `specs/001-council.md` | Wraps `openai.OpenAI(base_url="https://openrouter.ai/api/v1", ...)` `chat.completions.create(...)` for the 4 council vendors + the agentic Gemini Flash default. Sampling parameters left at provider defaults per FIX_PLAN §25.7. Reads `OPENROUTER_API_KEY` from the environment; reads pricing from `config/pricing/openrouter.yaml`. |
 | `CouncilVerdict` dataclass (referenced from spec 002) | `specs/002-artifacts.md` | Implements the artifact schema. |
-| Pricing table `config/pricing/openrouter.yaml` with 5 model entries | `specs/013-budget-tracker.md` | Entries for `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1`, `x-ai/grok-4.3`, and the agentic default `google/gemini-3.5-flash` (FIX_PLAN §25.6). |
+| Pricing table `config/pricing/openrouter.yaml` with 5 model entries | `specs/013-budget-tracker.md` | Entries for `openai/gpt-5.5`, `anthropic/claude-opus-4.7`, `google/gemini-3.1-pro-preview`, `x-ai/grok-4.3`, and the agentic default `google/gemini-3.5-flash` (FIX_PLAN §25.6). |
 | Calibration probe set (`factory/council/calibration/probes.yaml`) | `specs/001-council.md` | ≥10 divisive physics + meta-research questions. |
 | CLI: `python -m factory.council deliberate --question ... --council-id C1 --context <file.json>` | `specs/001-council.md` | For dev iteration. |
 | Test suite: pytest, ≥80% branch coverage on parsing + dispatch | `specs/001-council.md` | Mock mode for offline CI. |
@@ -95,6 +95,7 @@ PRD-002 closes when **all** of:
 
 - [ ] `factory/council/` package installs cleanly with `uv sync` or `pip install -e .`, exposing the OpenRouter-routed `factory/council/openrouter_client.py` wrapper.
 - [ ] `python -m factory.council deliberate ...` CLI runs end-to-end against live OpenRouter (reading `OPENROUTER_API_KEY` from the environment) and returns a parsed `CouncilVerdict`.
+- [ ] `python -m factory.council certify-live --cost-cap-usd 0.50` runs all four frontier vendors live, records budget entries for every LLM call, and proves a missing-model provider failure raises loudly.
 - [ ] `python -m factory.council calibrate` runs on the built-in probe set against the 4-vendor lineup and produces a disagreement report.
 - [ ] **Heterogeneity check.** The configured lineup contains ≥4 `ModelSpec` entries, **one per vendor in FIX_PLAN §25.3** (`openai`, `anthropic`, `google`, `x-ai`), with persona assignments spanning ≥3 distinct personas (`Visionary`, `Pessimist`, `Pragmatist`). Verified by a config-validation test that fails the build if the vendor lineup is incomplete or the persona span is less than 3.
 - [ ] **Threshold check.** Calibration on the built-in probes plus ≥5 operator-supplied domain probes returns an overall disagreement-rate ≥ 0.40. A rate in `0.30–0.40` triggers persona-prompt re-calibration (and optionally a rotation of persona–vendor pairings). A rate below 0.30 fails PRD-002 and the redesign trigger fires (FIX_PLAN §25.4).
